@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Relay – Private Bookmark Sync",
   "short_name": "Relay",
-  "version": "3.1.0",
+  "version": "3.3.0",
   "description": "Sync bookmarks across every browser. End-to-end encrypted. No account. No one can read your data — not even us.",
   "permissions": ["bookmarks", "storage", "alarms"],
   "action": {
