@@ -23,13 +23,31 @@ async function supabase(method, path, body) {
   return text ? JSON.parse(text) : null;
 }
 
-// Push encrypted blob to Supabase (upsert by vault_key)
+// Push encrypted blob to Supabase (update if exists, insert if new)
 async function pushToCloud(vaultId, encryptedBlob) {
-  await supabase('POST', 'vaults', {
-    vault_key:  vaultId,
-    data:       encryptedBlob,
-    updated_at: new Date().toISOString(),
-  });
+  const body = { data: encryptedBlob, updated_at: new Date().toISOString() };
+
+  // Try PATCH first (update existing row)
+  const patchRes = await fetch(
+    `${SUPABASE_URL}/rest/v1/vaults?vault_key=eq.${vaultId}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'apikey':        SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type':  'application/json',
+        'Prefer':        'return=representation',
+      },
+      body: JSON.stringify(body),
+    }
+  );
+  const patchText = await patchRes.text();
+  const patched   = patchText && JSON.parse(patchText);
+
+  // If PATCH updated nothing, INSERT a new row
+  if (!patched || patched.length === 0) {
+    await supabase('POST', 'vaults', { vault_key: vaultId, ...body });
+  }
 }
 
 // Pull encrypted blob from Supabase
