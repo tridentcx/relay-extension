@@ -52,20 +52,9 @@ async function decrypt(blob, passphrase) {
   return DEC.decode(pt);
 }
 
-// Derive a vault key (public identifier) from passphrase
-// This is a one-way hash — cannot reverse to passphrase
-async function vaultKey(passphrase) {
-  const salt = ENC.encode('relay-vault-id-v1');
-  const base = await crypto.subtle.importKey(
-    'raw', ENC.encode(passphrase), 'PBKDF2', false, ['deriveKey']
-  );
-  const key = await crypto.subtle.deriveKey(
-    { name: 'PBKDF2', salt, iterations: 100_000, hash: 'SHA-256' },
-    base,
-    { name: 'AES-GCM', length: 256 },
-    true,
-    ['encrypt']
-  );
-  const raw = await crypto.subtle.exportKey('raw', key);
-  return Array.from(new Uint8Array(raw)).map(b => b.toString(16).padStart(2,'0')).join('');
+// Generate a random vault ID — completely unrelated to the passphrase.
+// Stored in chrome.storage.local. Never derived from or linked to the passphrase.
+// An attacker needs BOTH this ID and the passphrase — knowing one tells them nothing about the other.
+function generateVaultId() {
+  return crypto.randomUUID();
 }

@@ -103,9 +103,12 @@ async function applyRemote(data) {
 
 // ─────────────────────────────────────────────────────────────────────
 // Main sync — bidirectional, fully encrypted
+// Vault ID is a random UUID stored locally — completely unlinked from passphrase.
+// Brute forcing the passphrase reveals nothing without also knowing the vault ID.
 // ─────────────────────────────────────────────────────────────────────
 async function doSync(passphrase) {
-  const vaultId = await vaultKey(passphrase);
+  const { vaultId } = await chrome.storage.local.get('vaultId');
+  if (!vaultId) throw new Error('No vault ID found. Please reinstall Relay.');
 
   // 1. Pull remote encrypted blob
   const remote = await pullFromCloud(vaultId);
