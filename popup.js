@@ -7,7 +7,7 @@ const ADJECTIVES = ['swift','calm','bold','bright','cool','deep','free','glad','
 const NOUNS      = ['panda','tiger','river','storm','cedar','ember','frost','grove','haven','island','lark','maple','prism','quartz','raven','stone'];
 
 function generateSuggestions(base) {
-  const clean = base.replace(/[^a-z0-9]/gi,'').toLowerCase().slice(0,12) || 'relay';
+  const clean = base.replace(/[^a-z0-9]/gi,'').toLowerCase().slice(0,12) || 'user';
   const arr   = new Uint32Array(4);
   crypto.getRandomValues(arr);
   return [
@@ -48,7 +48,7 @@ function validateUsername(username) {
   if (RESERVED.has(username))
                            return { ok:false, msg:`"${username}" is reserved.` };
   if (BLOCKED_PATTERNS.some(r => r.test(username)))
-                           return { ok:false, msg:'Can't start/end with - or _ or use them consecutively.' };
+                           return { ok:false, msg:"Can't start/end with - or _ or use them consecutively." };
   return { ok:true, msg:'' };
 }
 
@@ -132,8 +132,9 @@ function age(iso) {
 // ─────────────────────────────────────────────────────────────────────
 // Username availability check (debounced)
 // ─────────────────────────────────────────────────────────────────────
-let unameTimer = null;
-let unameValid = false;
+let unameTimer    = null;
+let unameValid    = false;
+let unameGeneration = 0; // FIX [H1]: discard stale async results
 
 async function checkUsername(username) {
   const statusEl = q('unameStatus');
@@ -142,6 +143,9 @@ async function checkUsername(username) {
   const inp      = q('unameInput');
   const sugsEl   = q('suggestions');
   const createBtn= q('btnCreate');
+
+  // FIX [H1]: Capture this check's generation before any await
+  const myGen = ++unameGeneration;
 
   // Reset
   statusEl.style.opacity='0';
@@ -155,7 +159,7 @@ async function checkUsername(username) {
   // Local validation first — no network call needed
   const { ok, msg } = validateUsername(username);
   if (!ok) {
-    if (msg) {
+    if (msg && myGen === unameGeneration) {
       statusEl.className='uname-status taken';
       statusEl.style.opacity='1';
       msgEl.textContent = msg;
@@ -172,6 +176,9 @@ async function checkUsername(username) {
   iconEl.textContent='·';
 
   const available = await checkUsernameAvailable(username);
+
+  // FIX [H1]: Discard result if a newer check has started
+  if (myGen !== unameGeneration) return;
 
   if (available) {
     statusEl.className='uname-status ok';
@@ -271,6 +278,28 @@ async function goMain(autoSync=false) {
     setTimeout(()=>runSync(getU(), getP()), 320);
 }
 
+// FIX [H3]: Pending sign-in — only persist credentials after successful sync
+async function goMainPending(autoSync=false) {
+  const u = getU();
+  show('vMain');
+  q('mainUsername').textContent = `@${u}`;
+  q('chkAuto').checked = false;
+  q('orbLabel').textContent = 'Sync Now';
+  q('orbSub').textContent   = 'Tap to verify your credentials';
+
+  if (autoSync) {
+    setTimeout(async () => {
+      try {
+        await runSync(getU(), getP());
+        // Only persist after successful sync — credentials verified
+        await chrome.storage.local.set({ hasAccount: true, username: u });
+      } catch {
+        // runSync already shows the error — don't persist bad credentials
+      }
+    }, 320);
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────
 // Events: Onboarding
 // ─────────────────────────────────────────────────────────────────────
@@ -350,7 +379,7 @@ q('siEye').addEventListener('click', ()=>eyeBtn('siPassword','siEye'));
 
 q('btnSignIn').addEventListener('click', async ()=>{
   const username = q('siUsername').value.trim().toLowerCase();
-  const password = q('siPassword').value;
+  const password = q('siPassword').value.trim(); // FIX [M5]: trim trailing spaces
   if (!username) { toast('toastSignIn','Enter your username.','err'); return; }
   if (!password) { toast('toastSignIn','Enter your password.','err'); return; }
 
@@ -361,8 +390,9 @@ q('btnSignIn').addEventListener('click', async ()=>{
   setP(password);
   q('siUsername').value='';
   q('siPassword').value='';
-  await chrome.storage.local.set({ hasAccount:true, username });
-  await goMain(true);
+  // FIX [H3]: Don't persist hasAccount until sync confirms credentials are correct
+  // goMain(true) will trigger sync which sets hasAccount on success
+  await goMainPending(true);
 
   q('btnSignIn').disabled=false;
   q('btnSignIn').innerHTML='Sign In &amp; Sync →';
