@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Relay – iCloud Bookmark Sync",
+  "short_name": "Relay",
+  "version": "1.0.0",
+  "description": "Your bookmarks, in sync across every browser. Powered by iCloud Drive. No account needed.",
+  "permissions": ["bookmarks", "storage"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Relay",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": { "service_worker": "background.js" },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "browser_specific_settings": {
+    "safari": { "strict_min_version": "15.4" }
+  }
+}
