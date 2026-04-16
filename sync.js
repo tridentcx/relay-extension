@@ -121,12 +121,17 @@ async function applyRemote(data) {
 
 // ─────────────────────────────────────────────────────────────────────
 // Main sync — bidirectional, fully encrypted
-// Vault ID is a random UUID stored locally — completely unlinked from passphrase.
-// Brute forcing the passphrase reveals nothing without also knowing the vault ID.
+// vault_key = SHA-256(username) — never stored in plaintext
+// Data encrypted with AES-256-GCM using the user's password
 // ─────────────────────────────────────────────────────────────────────
-async function doSync(passphrase) {
-  const { vaultId } = await chrome.storage.local.get('vaultId');
-  if (!vaultId) throw new Error('No vault ID found. Please reinstall Relay.');
+async function checkUsernameAvailable(username) {
+  const key  = await vaultKey(username);
+  const rows = await supabase('GET', `vaults?vault_key=eq.${key}&select=vault_key`);
+  return !rows || rows.length === 0;
+}
+
+async function doSync(username, password) {
+  const vaultId = await vaultKey(username);
 
   // 1. Pull remote encrypted blob
   const remote = await pullFromCloud(vaultId);
@@ -134,18 +139,18 @@ async function doSync(passphrase) {
 
   if (remote?.data) {
     try {
-      const plaintext = await decrypt(remote.data, passphrase);
+      const plaintext = await decrypt(remote.data, password);
       const data      = JSON.parse(plaintext);
       pulled = await applyRemote(data);
     } catch {
-      throw new Error('Wrong passphrase or corrupted data.');
+      throw new Error('Wrong password or corrupted data.');
     }
   }
 
   // 2. Get local snapshot (includes newly pulled bookmarks)
   const snapshot  = await getLocalSnapshot();
   const plaintext = JSON.stringify(snapshot);
-  const blob      = await encrypt(plaintext, passphrase);
+  const blob      = await encrypt(plaintext, password);
 
   // 3. Push encrypted blob to Supabase
   await pushToCloud(vaultId, blob);
