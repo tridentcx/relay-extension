@@ -103,28 +103,34 @@ function renderStrength(p) {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// Session — stored in background service worker.
-// Survives popup open/close. Clears when browser fully closes.
+// Session — chrome.storage.session
+// This is the correct API for extension session state:
+// - Persists across popup open/close ✓
+// - Shared across all extension contexts ✓
+// - Clears automatically when browser closes ✓
+// - Never written to disk ✓
 // ─────────────────────────────────────────────────────────────────────
 let _sessionU = null;
 let _sessionP = null;
 
 async function loadSession() {
   try {
-    const resp = await chrome.runtime.sendMessage({ type: 'SESSION_GET' });
-    _sessionU = resp.u;
-    _sessionP = resp.p;
+    const data = await chrome.storage.session.get(['relay_u','relay_p']);
+    _sessionU = data.relay_u || null;
+    _sessionP = data.relay_p || null;
   } catch { _sessionU = null; _sessionP = null; }
 }
 
 async function saveSession(u, p) {
-  _sessionU = u; _sessionP = p;
-  try { await chrome.runtime.sendMessage({ type: 'SESSION_SET', u, p }); } catch {}
+  _sessionU = u;
+  _sessionP = p;
+  try { await chrome.storage.session.set({ relay_u: u, relay_p: p }); } catch {}
 }
 
 async function clearSession() {
-  _sessionU = null; _sessionP = null;
-  try { await chrome.runtime.sendMessage({ type: 'SESSION_CLEAR' }); } catch {}
+  _sessionU = null;
+  _sessionP = null;
+  try { await chrome.storage.session.remove(['relay_u','relay_p']); } catch {}
 }
 
 const getU   = () => _sessionU;
