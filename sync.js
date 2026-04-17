@@ -162,9 +162,25 @@ async function checkUsernameAvailable(username) {
   return !rows || rows.length === 0;
 }
 
+// ── Plan checking ─────────────────────────────────────────────────────
+const FREE_BOOKMARK_LIMIT = 500;
+
+async function getPlan(vaultId) {
+  try {
+    const rows = await supabase('GET', `vault_plan?vault_key=eq.${vaultId}&select=effective_plan,bookmark_count`);
+    return rows?.[0] ?? { effective_plan: 'free', bookmark_count: 0 };
+  } catch {
+    return { effective_plan: 'free', bookmark_count: 0 };
+  }
+}
+
 // ── Main bidirectional sync ───────────────────────────────────────────
 async function doSync(username, password) {
   const vaultId = await vaultKey(username);
+
+  // Check plan
+  const planInfo = await getPlan(vaultId);
+  const isPro    = planInfo.effective_plan === 'pro';
 
   const remote = await pullFromCloud(vaultId);
   let pulled = 0;
@@ -179,9 +195,16 @@ async function doSync(username, password) {
     }
   }
 
-  const snapshot  = await getLocalSnapshot();
-  const blob      = await encrypt(JSON.stringify(snapshot), password);
+  const snapshot = await getLocalSnapshot();
+
+  // Enforce free tier limit on push
+  if (!isPro && snapshot.count > FREE_BOOKMARK_LIMIT) {
+    // Still pull (never withhold user data) but warn on push
+    throw new Error(`FREE_LIMIT:${snapshot.count}`);
+  }
+
+  const blob = await encrypt(JSON.stringify(snapshot), password);
   await pushToCloud(vaultId, blob);
 
-  return { pulled, count: snapshot.count };
+  return { pulled, count: snapshot.count, plan: planInfo.effective_plan };
 }

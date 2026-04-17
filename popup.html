@@ -338,7 +338,14 @@ body{
   <div class="wm">
     <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.65)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     <span class="wm-name">Relay</span>
-    <span class="wm-chip">E2E ENCRYPTED</span>
+    <span class="wm-chip" id="mainChip">FREE</span>
+  </div>
+
+  <!-- Upgrade row (hidden until limit hit) -->
+  <div id="upgradeRow" style="display:none;align-items:center;gap:10px;padding:10px 13px;background:#fffbf0;border:1px solid rgba(244,160,32,.25);border-radius:10px;margin-bottom:10px">
+    <span style="font-size:14px">⚡</span>
+    <div style="flex:1;font-size:12px;color:#a06000;line-height:1.4"><b>Free limit reached.</b> Upgrade to sync all bookmarks.</div>
+    <button id="upgradeRowBtn" style="font-size:12px;font-weight:600;color:#4361ee;background:none;border:none;cursor:pointer;padding:0;white-space:nowrap">Upgrade →</button>
   </div>
 
   <button class="orb-btn" id="btnSync">
@@ -387,7 +394,9 @@ body{
     <div class="sec-body">Only a <b>SHA-256 username hash</b> and an <b>encrypted blob</b>. Neither reveals who you are or what your bookmarks are.</div>
   </div>
   <div class="div"></div>
+  <button class="btn btn-blue" id="btnUpgrade" style="background:#4361ee">⚡ Upgrade to Pro — $18/year</button>
   <button class="btn btn-ghost" id="btnLock">🔒 Sign out of this browser</button>
+  <button class="btn btn-ghost" style="color:#e63946;border-color:rgba(230,57,70,.2)" id="btnDeleteAccount">Delete account</button>
   <button class="btn btn-ghost" id="btnBackMain">← Back</button>
 </div>
 
@@ -416,6 +425,36 @@ body{
     <button class="btn btn-text" id="btnNewUserSignIn">New to Relay? Create account →</button>
   </div>
   <div class="toast" id="toastSignIn"></div>
+</div>
+
+<!-- ══ DELETE CONFIRM ══════════════════════════════════ -->
+<div id="vDeleteConfirm" class="view">
+  <div class="wm">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.65)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <span class="wm-name">Delete account</span>
+  </div>
+  <div class="su-head">
+    <div class="su-illo" style="background:rgba(230,57,70,.08);border-color:rgba(230,57,70,.15)">🗑️</div>
+    <div class="su-title">Are you sure?</div>
+    <div class="su-sub">This will permanently delete your encrypted vault from the cloud. Your local bookmarks are <b>not</b> affected.</div>
+  </div>
+  <div class="hint amber" style="margin-bottom:16px">
+    <b>This cannot be undone.</b> Your synced bookmarks in the cloud will be gone. If you have a Pro subscription, please cancel it in Stripe first.
+  </div>
+  <button class="btn" style="background:#e63946;color:#fff;box-shadow:0 2px 8px rgba(230,57,70,.3);margin-bottom:8px" id="btnDeleteConfirm">Yes, delete everything</button>
+  <button class="btn btn-ghost" id="btnDeleteCancel">Cancel</button>
+  <div class="toast" id="toastDelete"></div>
+</div>
+
+<!-- ══ DELETED ══════════════════════════════════════════ -->
+<div id="vDeleted" class="view" style="text-align:center">
+  <div class="wm" style="justify-content:center">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.65)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <span class="wm-name">Relay</span>
+  </div>
+  <div style="font-size:40px;margin-bottom:16px">✓</div>
+  <div style="font-size:17px;font-weight:700;margin-bottom:8px">Account deleted</div>
+  <div style="font-size:13px;color:var(--t2);line-height:1.6">Your vault has been removed from our servers. Your local bookmarks are untouched. Redirecting…</div>
 </div>
 
 <script src="config.js"></script>

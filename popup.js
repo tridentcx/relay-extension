@@ -244,6 +244,9 @@ async function runSync(username, password) {
     q('orbLabel').textContent = pulled>0 ? `${pulled} bookmark${pulled===1?'':'s'} added` : 'All synced';
     q('orbSub').textContent   = `${count} bookmarks · encrypted`;
 
+    // Update plan badge
+    updatePlanBadge(plan);
+
     setTimeout(()=>{
       btn.disabled=false; btn.classList.remove('done');
       q('orbIco').textContent='⇄';
@@ -253,6 +256,18 @@ async function runSync(username, password) {
 
   } catch(err) {
     btn.disabled=false; btn.classList.remove('syncing','done');
+
+    // Handle free tier limit gracefully
+    if (err.message.startsWith('FREE_LIMIT:')) {
+      const count = err.message.split(':')[1];
+      q('orbIco').textContent='⚡';
+      q('orbLabel').textContent='Upgrade to sync all';
+      q('orbSub').textContent=`${count} bookmarks — free limit is 500`;
+      toast('toastMain', `You have ${count} bookmarks. Free plan supports 500. Upgrade to Pro for unlimited.`, 'err');
+      showUpgradePrompt();
+      return;
+    }
+
     q('orbIco').textContent='!';
     q('orbLabel').textContent='Sync failed';
     q('orbSub').textContent='';
@@ -260,6 +275,32 @@ async function runSync(username, password) {
     if (err.message.includes('password')) clearS();
     setTimeout(()=>{ q('orbIco').textContent='⇄'; q('orbLabel').textContent='Try Again'; },2000);
   }
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Plan helpers
+// ─────────────────────────────────────────────────────────────────────
+const PRICING_URL = 'https://shahakshat14.github.io/relay-extension/pricing/';
+
+function updatePlanBadge(plan) {
+  const chip = q('mainChip');
+  if (!chip) return;
+  if (plan === 'pro') {
+    chip.textContent = 'PRO';
+    chip.style.background = 'rgba(67,97,238,0.1)';
+    chip.style.color = '#4361ee';
+    chip.style.borderColor = 'rgba(67,97,238,0.2)';
+  } else {
+    chip.textContent = 'FREE';
+    chip.style.background = 'rgba(45,198,83,0.09)';
+    chip.style.color = '#2dc653';
+    chip.style.borderColor = 'rgba(45,198,83,0.18)';
+  }
+}
+
+function showUpgradePrompt() {
+  const el = q('upgradeRow');
+  if (el) el.style.display = 'flex';
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -364,6 +405,14 @@ q('btnSync').addEventListener('click', ()=>{
 });
 
 q('btnSecurity').addEventListener('click', ()=>show('vSecurity'));
+
+q('btnUpgrade')?.addEventListener('click', ()=>{
+  chrome.tabs.create({ url: PRICING_URL });
+});
+
+q('upgradeRowBtn')?.addEventListener('click', ()=>{
+  chrome.tabs.create({ url: PRICING_URL });
+});
 q('chkAuto').addEventListener('change', e=>chrome.storage.local.set({autoSync:e.target.checked}));
 
 // ─────────────────────────────────────────────────────────────────────
@@ -371,6 +420,45 @@ q('chkAuto').addEventListener('change', e=>chrome.storage.local.set({autoSync:e.
 // ─────────────────────────────────────────────────────────────────────
 q('btnLock').addEventListener('click', ()=>{ clearS(); show('vSignIn'); });
 q('btnBackMain').addEventListener('click', ()=>show('vMain'));
+
+q('btnDeleteAccount')?.addEventListener('click', ()=>show('vDeleteConfirm'));
+q('btnDeleteCancel')?.addEventListener('click', ()=>show('vSecurity'));
+
+q('btnDeleteConfirm')?.addEventListener('click', async ()=>{
+  const btn = q('btnDeleteConfirm');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="sp"></span> Deleting…';
+
+  try {
+    const u = getU();
+    const vaultId = await vaultKey(u);
+
+    // Delete vault from Supabase
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/vaults?vault_key=eq.${vaultId}`, {
+      method: 'DELETE',
+      headers: {
+        'apikey':        SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type':  'application/json',
+      },
+    });
+
+    if (!res.ok) throw new Error('Delete failed.');
+
+    // Clear all local state
+    clearS();
+    await chrome.storage.local.clear();
+
+    // Show confirmation then go to sign in
+    show('vDeleted');
+    setTimeout(()=>show('vSignIn'), 3000);
+
+  } catch(err) {
+    btn.disabled = false;
+    btn.innerHTML = 'Yes, delete everything';
+    toast('toastDelete', err.message, 'err');
+  }
+});
 
 // ─────────────────────────────────────────────────────────────────────
 // Events: Sign In
