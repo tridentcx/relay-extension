@@ -235,8 +235,8 @@ async function runSync(username, password) {
   clrT('toastMain');
 
   try {
-    const { pulled, count } = await doSync(username, password);
-    await chrome.storage.local.set({ lastSync:new Date().toISOString() });
+    const { pulled, count, plan } = await doSync(username, password);
+    await chrome.storage.local.set({ lastSync:new Date().toISOString(), plan });
     chrome.action.setBadgeText({text:''}).catch(()=>{});
 
     btn.classList.remove('syncing'); btn.classList.add('done');
@@ -310,10 +310,18 @@ async function goMain(autoSync=false) {
   const u = getU();
   show('vMain');
   q('mainUsername').textContent = `@${u}`;
-  const { lastSync, autoSync:aS } = await chrome.storage.local.get(['lastSync','autoSync']);
+
+  // BUG 2 FIX: Always persist so returning user stays signed in
+  await chrome.storage.local.set({ hasAccount: true, username: u });
+
+  const { lastSync, autoSync:aS, plan } =
+    await chrome.storage.local.get(['lastSync','autoSync','plan']);
   q('chkAuto').checked = !!aS;
   q('orbLabel').textContent = 'Sync Now';
   q('orbSub').textContent   = lastSync ? `Last synced ${age(lastSync)}` : 'Ready — tap to sync';
+
+  // Restore plan badge from storage (so it shows even before sync)
+  updatePlanBadge(plan || 'free');
 
   if (autoSync || (aS && (!lastSync || Date.now()-new Date(lastSync)>30_000)))
     setTimeout(()=>runSync(getU(), getP()), 320);
