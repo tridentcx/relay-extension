@@ -453,9 +453,18 @@ q('btnRefresh').addEventListener('click',()=>{
 });
 
 q('btnCopyGen').addEventListener('click',async()=>{
-  await navigator.clipboard.writeText(q('genText').textContent);
+  const pw = q('genText').textContent;
+  await navigator.clipboard.writeText(pw);
   q('btnCopyGen').textContent='✓';
   setTimeout(()=>q('btnCopyGen').textContent='⎘',1400);
+
+  // FIX [MED-4]: Auto-clear clipboard after 30s if it still has the password
+  setTimeout(async () => {
+    try {
+      const current = await navigator.clipboard.readText();
+      if (current === pw) await navigator.clipboard.writeText('');
+    } catch {} // permission denied is fine
+  }, 30_000);
 });
 
 q('btnCreate').addEventListener('click',async()=>{
@@ -577,17 +586,60 @@ q('btnDeleteCancel2')?.addEventListener('click',()=>show('vSecurity'));
 q('btnDeleteConfirm')?.addEventListener('click',async()=>{
   const btn=q('btnDeleteConfirm');
   btn.disabled=true;btn.innerHTML='<span class="sp"></span> Deleting…';
+
   try{
-    const vk=await vaultKey(getU());
+    const u = getU();
+    const p = getP();
+    if (!u || !p) throw new Error('Session expired. Sign in again.');
+
+    const vk = await vaultKey(u);
+
+    // FIX [MED-1]: Validate vault key format before any DB operation
+    if (!isValidVaultKey(vk)) throw new Error('Invalid vault key.');
+
+    // FIX [CRIT-1]: Verify password is correct BEFORE allowing delete.
+    // Pull the encrypted blob and try to decrypt — only proceed if it works.
+    // This prevents anyone-with-username from deleting other people's vaults.
+    const remote = await pullFromCloud(vk);
+    if (remote?.data) {
+      try {
+        await decrypt(remote.data, p);
+      } catch {
+        throw new Error('Password verification failed. Cannot delete.');
+      }
+    }
+    // (If no remote data, vault is local-only — safe to clear)
+
+    // Use ?Prefer header to get back the deleted rows so we can verify
     const res=await fetch(`${SUPABASE_URL}/rest/v1/vaults?vault_key=eq.${vk}`,{
       method:'DELETE',
-      headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`},
+      headers:{
+        'apikey':SUPABASE_KEY,
+        'Authorization':`Bearer ${SUPABASE_KEY}`,
+        'Prefer':'return=representation',
+      },
     });
-    if(!res.ok)throw new Error('Delete failed.');
+
+    if(!res.ok){
+      const err = await res.text().catch(() => '');
+      // RLS blocks DELETE — that's actually correct behaviour now
+      if (res.status === 401 || res.status === 403) {
+        throw new Error('Server refused delete. Contact support.');
+      }
+      throw new Error('Delete failed: '+(err || res.status));
+    }
+
+    // Verify something was actually deleted (RLS might silently succeed with 0 rows)
+    const deletedRows = await res.json().catch(() => []);
+    if (Array.isArray(deletedRows) && deletedRows.length === 0 && remote?.data) {
+      throw new Error('Server didn\'t delete the vault. Contact support.');
+    }
+
     await clearSession();
     await chrome.storage.local.clear();
     show('vDeleted');
     setTimeout(()=>show('vSignIn'),3000);
+
   }catch(err){
     btn.disabled=false;btn.innerHTML='Delete my account';
     toast('toastDelete',err.message,'err');
