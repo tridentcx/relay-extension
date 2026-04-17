@@ -570,6 +570,7 @@ q('btnRedeemGift')?.addEventListener('click',async()=>{
 // Delete account events
 // ─────────────────────────────────────────────────────────────────────
 q('btnDeleteCancel')?.addEventListener('click',()=>show('vSecurity'));
+q('btnDeleteCancel2')?.addEventListener('click',()=>show('vSecurity'));
 
 q('btnDeleteConfirm')?.addEventListener('click',async()=>{
   const btn=q('btnDeleteConfirm');
