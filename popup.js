@@ -256,10 +256,12 @@ function updateCreateBtn() {
 // ─────────────────────────────────────────────────────────────────────
 async function runSync(username, password) {
   const btn = q('btnSync');
-  btn.disabled=true; btn.classList.add('syncing');
+  btn.disabled=true;
+  btn.classList.remove('done'); btn.classList.add('syncing');
+  const orbEl = q('mainOrb'); if(orbEl) orbEl.className='orb syncing';
   q('orbIco').textContent='⇄';
   q('orbLabel').textContent='Syncing…';
-  q('orbSub').textContent='Encrypting your bookmarks';
+  q('orbSub').textContent='Encrypting your bookmarks…';
   clrT('toastMain');
 
   try {
@@ -268,6 +270,7 @@ async function runSync(username, password) {
     chrome.action.setBadgeText({text:''}).catch(()=>{});
 
     btn.classList.remove('syncing'); btn.classList.add('done');
+    const orbElS = q('mainOrb'); if(orbElS) orbElS.className='orb done';
     q('orbIco').textContent='✓';
     q('orbLabel').textContent = pulled>0 ? `${pulled} bookmark${pulled===1?'':'s'} added` : 'All synced';
     q('orbSub').textContent   = `${count} bookmarks · encrypted`;
@@ -276,10 +279,11 @@ async function runSync(username, password) {
     updatePlanBadge(plan);
 
     setTimeout(()=>{
-      btn.disabled=false; btn.classList.remove('done');
+      btn.disabled=false; btn.classList.remove('done','syncing');
+      const orbElR = q('mainOrb'); if(orbElR) orbElR.className='orb';
       q('orbIco').textContent='⇄';
       q('orbLabel').textContent='Sync Now';
-      q('orbSub').textContent=`Last synced just now`;
+      q('orbSub').textContent='Last synced just now';
     }, 3000);
 
   } catch(err) {
@@ -296,12 +300,13 @@ async function runSync(username, password) {
       return;
     }
 
-    q('orbIco').textContent='!';
+    const orbElE = q('mainOrb'); if(orbElE) orbElE.className='orb';
+    q('orbIco').textContent='⚠';
     q('orbLabel').textContent='Sync failed';
     q('orbSub').textContent='';
     toast('toastMain', err.message, 'err');
     if (err.message.includes('password')) clearS();
-    setTimeout(()=>{ q('orbIco').textContent='⇄'; q('orbLabel').textContent='Try Again'; },2000);
+    setTimeout(()=>{ if(q('orbIco')) q('orbIco').textContent='⇄'; if(q('orbLabel')) q('orbLabel').textContent='Try Again'; },2000);
   }
 }
 
@@ -328,7 +333,7 @@ function updatePlanBadge(plan) {
 
 function showUpgradePrompt() {
   const el = q('upgradeRow');
-  if (el) el.style.display = 'flex';
+  if (el) { el.style.display = 'flex'; el.classList.add('upgrade-row'); }
 }
 
 // ─────────────────────────────────────────────────────────────────────

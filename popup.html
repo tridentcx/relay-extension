@@ -2,425 +2,453 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
-
 :root {
-  --bg:       #f5f5f7;
-  --card:     #ffffff;
-  --bdr:      rgba(0,0,0,0.07);
-  --blue:     #4361ee;
-  --blue-l:   rgba(67,97,238,0.09);
-  --green:    #2dc653;
-  --green-l:  rgba(45,198,83,0.09);
-  --amber:    #f4a020;
-  --amber-l:  rgba(244,160,32,0.09);
-  --red:      #e63946;
-  --red-l:    rgba(230,57,70,0.08);
-  --t1:       #0f0f12;
-  --t2:       #80808a;
-  --t3:       #c0c0c8;
-  --sh:       0 1px 3px rgba(0,0,0,0.06),0 4px 16px rgba(0,0,0,0.04);
-  --sh-s:     0 1px 2px rgba(0,0,0,0.05),0 2px 8px rgba(0,0,0,0.03);
+  --bg:       #080810;
+  --bg2:      #0d0d18;
+  --surf:     rgba(255,255,255,0.042);
+  --surf2:    rgba(255,255,255,0.07);
+  --bdr:      rgba(255,255,255,0.08);
+  --bdr2:     rgba(255,255,255,0.13);
+  --blue:     #4f6ef7;
+  --blue-g:   linear-gradient(135deg,#3d5af1,#6b8aff);
+  --blue-l:   rgba(79,110,247,0.14);
+  --blue-ll:  rgba(79,110,247,0.07);
+  --green:    #3ecf6e;
+  --green-l:  rgba(62,207,110,0.12);
+  --amber:    #f5a623;
+  --amber-l:  rgba(245,166,35,0.1);
+  --red:      #f26d6d;
+  --red-l:    rgba(242,109,109,0.1);
+  --t1:       rgba(255,255,255,0.95);
+  --t2:       rgba(255,255,255,0.45);
+  --t3:       rgba(255,255,255,0.18);
   --r:        13px;
   --rs:       10px;
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-font-smoothing:antialiased}
+html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+
 body{
-  width:320px; background:var(--bg); color:var(--t1);
-  font-family:'DM Sans',-apple-system,'Helvetica Neue',sans-serif;
+  width:320px;
+  background:var(--bg);
+  color:var(--t1);
+  font-family:'Geist',-apple-system,'Helvetica Neue',sans-serif;
   overflow:hidden;
+  position:relative;
 }
 
-.view{display:none;padding:22px 18px}
-.view.active{display:block;animation:up .18s cubic-bezier(.2,0,0,1)}
-@keyframes up{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+/* Ambient background glow */
+body::before{
+  content:'';
+  position:fixed;
+  width:280px;height:280px;
+  top:-80px;left:50%;transform:translateX(-50%);
+  background:radial-gradient(circle,rgba(79,110,247,0.12) 0%,transparent 70%);
+  pointer-events:none;z-index:0;
+}
 
-/* ── Logo ── */
-.wm{display:flex;align-items:center;gap:9px;margin-bottom:22px}
+/* Views */
+.view{display:none;padding:20px 18px;position:relative;z-index:1}
+.view.active{display:block;animation:fadeUp .2s cubic-bezier(.16,1,.3,1)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── Wordmark ── */
+.wm{display:flex;align-items:center;gap:9px;margin-bottom:20px}
 .logo{
-  width:30px;height:30px;border-radius:9px;
-  background:var(--blue);flex-shrink:0;
+  width:28px;height:28px;border-radius:8px;
+  background:var(--blue-g);
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 8px rgba(67,97,238,.32);
+  box-shadow:0 0 0 1px rgba(79,110,247,.3),0 4px 12px rgba(79,110,247,.3);
+  flex-shrink:0;
 }
-.logo svg{width:17px;height:17px}
-.wm-name{font-size:15px;font-weight:700;letter-spacing:-.3px}
-.wm-chip{
-  margin-left:auto;font-size:9px;font-weight:600;letter-spacing:.5px;
-  padding:3px 7px;border-radius:20px;
+.logo svg{width:16px;height:16px}
+.wm-name{font-size:14px;font-weight:600;letter-spacing:-.3px;color:var(--t1)}
+.wm-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+.plan-chip{
+  font-size:9px;font-weight:700;letter-spacing:.6px;
+  padding:2px 7px;border-radius:20px;
   background:var(--green-l);color:var(--green);
-  border:1px solid rgba(45,198,83,.18);
+  border:1px solid rgba(62,207,110,.2);
+  transition:all .3s;
+}
+.plan-chip.pro{
+  background:var(--blue-l);color:#8ba3ff;
+  border-color:rgba(79,110,247,.25);
 }
 
-/* ── Orb button ── */
-.orb-btn{
-  width:100%;height:92px;
-  background:var(--card);border:1.5px solid var(--bdr);
-  border-radius:16px;cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
-  margin-bottom:11px;box-shadow:var(--sh);
-  transition:all .2s cubic-bezier(.2,0,0,1);
-  position:relative;overflow:hidden;outline:none;
+/* ── Main sync card ── */
+.sync-card{
+  width:100%;
+  background:var(--surf);
+  border:1px solid var(--bdr);
+  border-radius:16px;
+  padding:22px 18px 16px;
+  margin-bottom:10px;
+  cursor:pointer;
+  position:relative;overflow:hidden;
+  transition:all .25s cubic-bezier(.16,1,.3,1);
+  outline:none;
 }
-.orb-btn::before{
+.sync-card::before{
   content:'';position:absolute;inset:0;border-radius:15px;
-  background:linear-gradient(135deg,var(--blue-l),transparent);
+  background:radial-gradient(ellipse at 50% 0%,rgba(79,110,247,.1),transparent 60%);
+  opacity:0;transition:opacity .3s;
+}
+.sync-card:hover{border-color:var(--bdr2);transform:translateY(-1px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.sync-card:hover::before{opacity:1}
+.sync-card:active{transform:none;box-shadow:none}
+.sync-card:disabled{cursor:default;transform:none}
+
+/* Syncing state */
+.sync-card.syncing{border-color:rgba(79,110,247,.3);cursor:default}
+.sync-card.syncing::before{opacity:1;animation:syncPulse 1.4s ease-in-out infinite alternate}
+@keyframes syncPulse{from{opacity:.4}to{opacity:1}}
+
+/* Done state */
+.sync-card.done{border-color:rgba(62,207,110,.25);cursor:default}
+.sync-card.done::before{background:radial-gradient(ellipse at 50% 0%,rgba(62,207,110,.08),transparent 60%);opacity:1}
+
+/* Orb */
+.orb-row{display:flex;align-items:center;justify-content:center;margin-bottom:14px;position:relative}
+.orb{
+  width:52px;height:52px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,rgba(79,110,247,.15),rgba(0,0,0,.4));
+  border:1px solid rgba(79,110,247,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;line-height:1;
+  position:relative;
+  transition:all .4s cubic-bezier(.16,1,.3,1);
+  box-shadow:0 0 0 0 rgba(79,110,247,.3);
+}
+.orb.syncing{
+  border-color:rgba(79,110,247,.4);
+  box-shadow:0 0 20px rgba(79,110,247,.2);
+  animation:orbBreath 1.2s ease-in-out infinite alternate;
+}
+@keyframes orbBreath{from{box-shadow:0 0 10px rgba(79,110,247,.15)}to{box-shadow:0 0 28px rgba(79,110,247,.35)}}
+
+.orb.done{
+  background:radial-gradient(circle at 35% 30%,rgba(62,207,110,.15),rgba(0,0,0,.3));
+  border-color:rgba(62,207,110,.3);
+  box-shadow:0 0 20px rgba(62,207,110,.15);
+}
+
+/* Spin ring */
+.spin-ring{
+  position:absolute;inset:-4px;border-radius:50%;
+  border:1.5px solid transparent;
+  border-top-color:var(--blue);
+  border-right-color:rgba(79,110,247,.3);
+  opacity:0;transition:opacity .2s;
+  pointer-events:none;
+}
+.orb.syncing .spin-ring{opacity:1;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.orb-ico{transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.sync-card:hover:not(:disabled) .orb-ico{transform:scale(1.1) rotate(-8deg)}
+.sync-card.syncing .orb-ico{animation:syncSpin .9s linear infinite}
+@keyframes syncSpin{to{transform:rotate(360deg)}}
+
+/* Sync text */
+.sync-title{
+  font-size:17px;font-weight:600;text-align:center;
+  letter-spacing:-.3px;margin-bottom:4px;
+  transition:color .3s;
+}
+.sync-sub{
+  font-size:11.5px;color:var(--t2);text-align:center;
+  line-height:1.4;min-height:15px;
+  transition:all .2s;
+}
+
+/* Progress dots */
+.sync-dots{
+  display:flex;justify-content:center;gap:4px;margin-top:10px;
   opacity:0;transition:opacity .2s;
 }
-.orb-btn:hover{transform:translateY(-1px);box-shadow:0 2px 6px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.07);border-color:rgba(67,97,238,.2)}
-.orb-btn:hover::before{opacity:1}
-.orb-btn:active{transform:none;box-shadow:var(--sh-s)}
-.orb-btn:disabled{cursor:default;opacity:.6;transform:none}
-.orb-btn.syncing{border-color:rgba(67,97,238,.25)}
-.orb-btn.syncing::before{opacity:1;animation:pulse 1.2s ease-in-out infinite alternate}
-@keyframes pulse{from{opacity:.5}to{opacity:1}}
-.orb-btn.done{border-color:rgba(45,198,83,.25);background:#fafffe}
-.orb-btn.done::before{background:linear-gradient(135deg,var(--green-l),transparent);opacity:1}
-.orb-spin-ring{
-  position:absolute;width:32px;height:32px;
-  border:2px solid transparent;border-top-color:var(--blue);
-  border-radius:50%;opacity:0;transition:opacity .15s;
-  top:50%;left:50%;transform:translate(-50%,-68%);
+.sync-card.syncing .sync-dots{opacity:1}
+.dot{
+  width:4px;height:4px;border-radius:50%;
+  background:var(--blue);opacity:.4;
+  animation:dotPulse 1.2s ease-in-out infinite;
 }
-.orb-btn.syncing .orb-spin-ring{opacity:1;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:translate(-50%,-68%) rotate(360deg)}}
-.orb-icon{font-size:24px;line-height:1;transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
-.orb-btn:hover .orb-icon{transform:scale(1.1)}
-.orb-btn.syncing .orb-icon{animation:spinI .8s linear infinite}
-@keyframes spinI{to{transform:rotate(360deg)}}
-.orb-label{font-size:13.5px;font-weight:600;letter-spacing:-.2px}
-.orb-sub{font-size:11px;color:var(--t2);position:absolute;bottom:9px}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes dotPulse{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:.9;transform:scale(1.2)}}
 
-/* ── Rows ── */
+/* ── Info rows ── */
+.rows{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}
+
 .row{
-  display:flex;align-items:center;gap:9px;
-  padding:11px 13px;background:var(--card);
-  border:1px solid var(--bdr);border-radius:var(--rs);
-  margin-bottom:8px;box-shadow:var(--sh-s);
+  display:flex;align-items:center;gap:10px;
+  padding:10px 13px;
+  background:var(--surf);border:1px solid var(--bdr);
+  border-radius:var(--rs);
+  transition:border-color .15s;
 }
-.row-ico{font-size:15px;flex-shrink:0}
+.row:hover{border-color:var(--bdr2)}
+.row-ico{font-size:14px;flex-shrink:0;opacity:.8}
 .row-body{flex:1;min-width:0}
-.row-text{font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.row-hint{font-size:11px;color:var(--t2);margin-top:1px}
-.row-action{font-size:12px;color:var(--blue);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;font-weight:500;flex-shrink:0}
-.row-action:hover{opacity:.7}
-
-/* ── Toggle ── */
-.tog{
-  display:flex;align-items:center;gap:9px;
-  padding:11px 13px;background:var(--card);
-  border:1px solid var(--bdr);border-radius:var(--rs);
-  box-shadow:var(--sh-s);cursor:pointer;user-select:none;
+.row-label{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--t1)}
+.row-hint{font-size:10.5px;color:var(--t2);margin-top:1px}
+.row-action{
+  font-size:11.5px;font-weight:500;color:var(--blue);
+  background:none;border:none;cursor:pointer;padding:0;
+  font-family:inherit;opacity:.8;flex-shrink:0;
+  transition:opacity .15s;
 }
+.row-action:hover{opacity:1}
+
+/* Toggle */
+.tog{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 13px;
+  background:var(--surf);border:1px solid var(--bdr);
+  border-radius:var(--rs);cursor:pointer;user-select:none;
+  transition:border-color .15s;
+}
+.tog:hover{border-color:var(--bdr2)}
 .tog-body{flex:1}
-.tog-text{font-size:12.5px;font-weight:500}
-.tog-hint{font-size:11px;color:var(--t2);margin-top:1px}
+.tog-label{font-size:12px;font-weight:500}
+.tog-hint{font-size:10.5px;color:var(--t2);margin-top:1px}
 .ios input{display:none}
 .ios-t{
-  display:block;width:38px;height:22px;
-  background:#dddde3;border-radius:11px;position:relative;transition:background .2s;
+  display:block;width:36px;height:20px;
+  background:rgba(255,255,255,.1);border:1px solid var(--bdr);
+  border-radius:10px;position:relative;transition:background .2s,border-color .2s;
 }
 .ios-t::after{
   content:'';position:absolute;top:2px;left:2px;
-  width:18px;height:18px;background:#fff;border-radius:50%;
-  box-shadow:0 1px 4px rgba(0,0,0,.2);
-  transition:transform .2s cubic-bezier(.34,1.4,.64,1);
+  width:14px;height:14px;background:rgba(255,255,255,.5);
+  border-radius:50%;transition:transform .2s cubic-bezier(.34,1.4,.64,1),background .2s;
+  box-shadow:0 1px 3px rgba(0,0,0,.4);
 }
-.ios input:checked+.ios-t{background:var(--green)}
-.ios input:checked+.ios-t::after{transform:translateX(16px)}
+.ios input:checked+.ios-t{background:var(--green);border-color:transparent}
+.ios input:checked+.ios-t::after{transform:translateX(16px);background:#fff}
 
 /* ── Inputs ── */
 .inp-wrap{position:relative;margin-bottom:8px}
 .inp{
-  width:100%;padding:12px 42px 12px 13px;
-  background:var(--card);border:1.5px solid var(--bdr);
+  width:100%;padding:11px 40px 11px 13px;
+  background:var(--surf);border:1px solid var(--bdr);
   border-radius:var(--rs);color:var(--t1);
-  font-size:14px;font-family:inherit;outline:none;
-  box-shadow:var(--sh-s);transition:border-color .15s,box-shadow .15s;
+  font-size:13.5px;font-family:inherit;outline:none;
+  transition:border-color .15s,box-shadow .15s,background .15s;
 }
-.inp:focus{border-color:rgba(67,97,238,.4);box-shadow:0 0 0 3px rgba(67,97,238,.1)}
+.inp:focus{
+  background:var(--surf2);
+  border-color:rgba(79,110,247,.45);
+  box-shadow:0 0 0 3px rgba(79,110,247,.1);
+}
 .inp::placeholder{color:var(--t3)}
-.inp.valid{border-color:rgba(45,198,83,.5)}
-.inp.taken{border-color:rgba(230,57,70,.4)}
-.inp-ico{
+.inp.valid{border-color:rgba(62,207,110,.4)}
+.inp.taken{border-color:rgba(242,109,109,.4)}
+.inp-eye{
   position:absolute;right:12px;top:50%;transform:translateY(-50%);
   background:none;border:none;cursor:pointer;padding:0;
-  font-size:14px;color:var(--t3);transition:color .15s;
+  font-size:13px;color:var(--t3);transition:color .15s;
 }
-.inp-ico:hover{color:var(--t2)}
+.inp-eye:hover{color:var(--t2)}
 
-/* ── Username status row ── */
+/* Username status */
 .uname-status{
   display:flex;align-items:center;gap:7px;
-  padding:0 2px;margin-top:-4px;margin-bottom:8px;
-  min-height:18px;font-size:11.5px;
-  transition:opacity .2s;
+  padding:0 2px;margin:-2px 0 8px;
+  min-height:16px;font-size:11.5px;color:var(--t2);
+  transition:opacity .2s;opacity:0;
 }
-.uname-dot{
-  width:7px;height:7px;border-radius:50%;flex-shrink:0;
-  transition:background .2s;
-}
+.uname-dot{width:6px;height:6px;border-radius:50%;background:var(--t3);flex-shrink:0;transition:background .2s}
 .uname-status.checking .uname-dot{background:var(--t3);animation:blink .7s ease-in-out infinite alternate}
-@keyframes blink{from{opacity:.3}to{opacity:1}}
-.uname-status.ok      .uname-dot{background:var(--green)}
-.uname-status.taken   .uname-dot{background:var(--red)}
+@keyframes blink{from{opacity:.2}to{opacity:1}}
+.uname-status.ok .uname-dot{background:var(--green)}
+.uname-status.ok{color:var(--green)}
+.uname-status.taken .uname-dot{background:var(--red)}
+.uname-status.taken{color:var(--red)}
 
-/* ── Suggestions ── */
-.suggestions{
-  display:flex;flex-wrap:wrap;gap:5px;
-  padding:0 2px;margin-bottom:8px;
-}
+/* Suggestions */
+.suggestions{display:flex;flex-wrap:wrap;gap:5px;padding:0 2px;margin-bottom:8px}
 .sug-btn{
-  font-size:12px;font-weight:500;font-family:inherit;
-  padding:4px 10px;border-radius:20px;border:1px solid var(--bdr);
-  background:var(--card);color:var(--t2);cursor:pointer;
-  transition:all .15s;box-shadow:var(--sh-s);
+  font-size:11.5px;font-weight:500;font-family:inherit;
+  padding:4px 10px;border-radius:20px;
+  border:1px solid var(--bdr);background:var(--surf);
+  color:var(--t2);cursor:pointer;transition:all .15s;
 }
-.sug-btn:hover{border-color:rgba(67,97,238,.3);color:var(--blue);background:var(--blue-l)}
+.sug-btn:hover{border-color:rgba(79,110,247,.4);color:var(--blue);background:var(--blue-ll)}
 
-/* ── Strength ── */
+/* Strength bars */
 .str-bars{display:flex;gap:3px;margin-bottom:5px}
-.str-bar{flex:1;height:3px;border-radius:2px;background:var(--bdr);transition:background .25s}
-.str-lbl{font-size:11px;color:var(--t2);text-align:right;margin-bottom:10px;transition:color .25s}
+.str-bar{flex:1;height:2px;border-radius:2px;background:rgba(255,255,255,.08);transition:background .25s}
+.str-lbl{font-size:10.5px;color:var(--t2);text-align:right;margin-bottom:10px;transition:color .25s}
 
-/* ── Buttons ── */
-.btn{
-  width:100%;padding:13px;border:none;border-radius:var(--r);
-  font-size:14.5px;font-weight:600;letter-spacing:-.2px;
-  cursor:pointer;font-family:inherit;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  margin-bottom:8px;transition:all .18s;
+/* Generated passphrase */
+.gen-box{
+  background:var(--blue-ll);border:1px solid rgba(79,110,247,.2);
+  border-radius:var(--rs);padding:10px 13px;
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:8px;animation:fadeUp .15s ease;
 }
-.btn:disabled{opacity:.4;cursor:default}
-.btn-blue{background:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(67,97,238,.3)}
-.btn-blue:hover:not(:disabled){background:#3451d1;box-shadow:0 4px 16px rgba(67,97,238,.4);transform:translateY(-1px)}
-.btn-blue:active:not(:disabled){transform:none}
-.btn-ghost{background:var(--card);color:var(--t2);border:1px solid var(--bdr);box-shadow:var(--sh-s);font-size:13.5px}
-.btn-ghost:hover:not(:disabled){color:var(--t1);border-color:rgba(0,0,0,.12)}
-.btn-text{background:none;color:var(--t2);box-shadow:none;font-size:12.5px;padding:8px;margin-bottom:4px;opacity:.8}
-.btn-text:hover{opacity:1;color:var(--blue)}
+.gen-text{
+  flex:1;font-size:12.5px;font-weight:600;color:#8ba3ff;
+  letter-spacing:.2px;word-break:break-all;line-height:1.5;
+}
+.gen-actions{display:flex;gap:5px;flex-shrink:0}
+.gen-btn{
+  width:25px;height:25px;border-radius:7px;
+  background:rgba(79,110,247,.15);border:none;cursor:pointer;
+  font-size:12px;display:flex;align-items:center;justify-content:center;
+  color:#8ba3ff;transition:background .15s;
+}
+.gen-btn:hover{background:rgba(79,110,247,.28)}
 
-/* ── Hint ── */
+/* Buttons */
+.btn{
+  width:100%;padding:12px;border:none;border-radius:var(--r);
+  font-size:14px;font-weight:600;letter-spacing:-.2px;
+  cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  margin-bottom:7px;transition:all .2s cubic-bezier(.16,1,.3,1);
+  position:relative;overflow:hidden;
+}
+.btn:disabled{opacity:.38;cursor:default;transform:none!important}
+
+.btn-blue{
+  background:var(--blue-g);color:#fff;
+  box-shadow:0 1px 0 rgba(255,255,255,.12) inset,0 4px 16px rgba(79,110,247,.3);
+}
+.btn-blue:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 1px 0 rgba(255,255,255,.12) inset,0 8px 24px rgba(79,110,247,.4)}
+.btn-blue:active:not(:disabled){transform:none}
+
+.btn-ghost{
+  background:var(--surf);color:var(--t2);
+  border:1px solid var(--bdr);font-size:13px;
+}
+.btn-ghost:hover:not(:disabled){color:var(--t1);border-color:var(--bdr2);background:var(--surf2)}
+
+.btn-danger{background:rgba(242,109,109,.12);color:var(--red);border:1px solid rgba(242,109,109,.2);font-size:13px}
+.btn-danger:hover:not(:disabled){background:rgba(242,109,109,.2);border-color:rgba(242,109,109,.35)}
+
+.btn-text{background:none;color:var(--blue);box-shadow:none;font-size:12.5px;padding:8px;margin-bottom:4px;opacity:.75}
+.btn-text:hover{opacity:1}
+
+/* Hint */
 .hint{
-  background:var(--card);border:1px solid var(--bdr);
-  border-radius:var(--rs);padding:11px 13px;margin-bottom:10px;
-  font-size:12px;color:var(--t2);line-height:1.65;box-shadow:var(--sh-s);
+  background:var(--surf);border:1px solid var(--bdr);
+  border-radius:var(--rs);padding:10px 13px;margin-bottom:10px;
+  font-size:11.5px;color:var(--t2);line-height:1.65;
 }
 .hint b{color:var(--t1);font-weight:600}
-.hint.amber{background:var(--amber-l);border-color:rgba(244,160,32,.2)}
-.hint.amber b{color:#a06000}
+.hint.amber{background:var(--amber-l);border-color:rgba(245,166,35,.2)}
+.hint.amber b{color:var(--amber)}
 
-/* ── Setup header ── */
+/* Setup header */
 .su-head{text-align:center;margin-bottom:20px}
 .su-illo{
-  width:52px;height:52px;border-radius:15px;
-  background:var(--blue-l);border:1px solid rgba(67,97,238,.15);
+  width:48px;height:48px;border-radius:14px;
+  background:var(--blue-ll);border:1px solid rgba(79,110,247,.2);
   display:flex;align-items:center;justify-content:center;
-  font-size:24px;margin:0 auto 14px;
+  font-size:22px;margin:0 auto 14px;
 }
-.su-title{font-size:17px;font-weight:700;letter-spacing:-.4px;margin-bottom:5px}
-.su-sub{font-size:12.5px;color:var(--t2);line-height:1.6}
+.su-title{font-size:18px;font-weight:700;letter-spacing:-.4px;margin-bottom:5px}
+.su-sub{font-size:12.5px;color:var(--t2);line-height:1.65}
 
-/* ── Onboarding split ── */
-.ob-head{margin-bottom:20px}
-.ob-title{font-size:21px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px}
-.ob-sub{font-size:13px;color:var(--t2);line-height:1.6}
+/* Sec cards */
+.sec-card{
+  background:var(--surf);border:1px solid var(--bdr);
+  border-radius:var(--rs);padding:12px 13px;
+  margin-bottom:7px;
+}
+.sec-hd{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.sec-ico{font-size:16px;opacity:.85}
+.sec-title{font-size:12.5px;font-weight:600}
+.sec-body{font-size:11.5px;color:var(--t2);line-height:1.65}
+.sec-body b{color:var(--t1);font-weight:500}
+
+.vault-row{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(0,0,0,.2);border-radius:7px;
+  padding:7px 10px;margin-top:8px;
+}
+.vault-id{font-size:10.5px;font-family:ui-monospace,'SF Mono',monospace;color:var(--t2);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vault-copy{font-size:11px;color:var(--blue);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;font-weight:500;opacity:.8}
+.vault-copy:hover{opacity:1}
+
+/* Divider */
+.div{height:1px;background:var(--bdr);margin:12px 0}
+
+/* Toast */
+.toast{margin-top:8px;padding:9px 12px;border-radius:var(--rs);font-size:11.5px;line-height:1.5;display:none}
+.toast.ok {background:var(--green-l);border:1px solid rgba(62,207,110,.2);color:var(--green);display:block}
+.toast.err{background:var(--red-l);border:1px solid rgba(242,109,109,.15);color:var(--red);display:block}
+
+/* Onboarding */
+.ob-head{margin-bottom:22px}
+.ob-title{font-size:22px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px;line-height:1.2}
+.ob-sub{font-size:13px;color:var(--t2);line-height:1.65}
 .ob-split{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
 .ob-card{
-  background:var(--card);border:1.5px solid var(--bdr);
-  border-radius:var(--r);padding:15px 13px;
-  cursor:pointer;transition:all .18s;
-  display:flex;flex-direction:column;align-items:flex-start;gap:5px;
-  box-shadow:var(--sh-s);
+  background:var(--surf);border:1.5px solid var(--bdr);
+  border-radius:14px;padding:16px 14px;
+  cursor:pointer;transition:all .2s cubic-bezier(.16,1,.3,1);
+  display:flex;flex-direction:column;align-items:flex-start;gap:6px;
 }
-.ob-card:hover{border-color:rgba(67,97,238,.3);transform:translateY(-1px);box-shadow:var(--sh)}
+.ob-card:hover{border-color:var(--bdr2);transform:translateY(-2px);background:var(--surf2)}
 .ob-card:active{transform:none}
-.ob-ico{font-size:21px}
+.ob-ico{font-size:22px;line-height:1}
 .ob-ttl{font-size:13px;font-weight:600;letter-spacing:-.2px}
 .ob-dsc{font-size:11px;color:var(--t2);line-height:1.45}
 
-/* ── Sec card ── */
-.sec-card{
-  background:var(--card);border:1px solid var(--bdr);
-  border-radius:var(--rs);padding:12px 13px;
-  margin-bottom:8px;box-shadow:var(--sh-s);
+/* Upgrade row */
+.upgrade-row{
+  display:none;align-items:center;gap:10px;
+  padding:10px 13px;
+  background:var(--amber-l);border:1px solid rgba(245,166,35,.2);
+  border-radius:var(--rs);margin-bottom:8px;
+  animation:fadeUp .2s ease;
 }
-.sec-hd{display:flex;align-items:center;gap:8px;margin-bottom:5px}
-.sec-ico{font-size:17px}
-.sec-title{font-size:13px;font-weight:600}
-.sec-body{font-size:12px;color:var(--t2);line-height:1.65}
-.sec-body b{color:var(--t1);font-weight:500}
-
-/* ── Divider ── */
-.div{height:1px;background:var(--bdr);margin:12px 0}
-
-/* ── Toast ── */
-.toast{margin-top:8px;padding:10px 12px;border-radius:var(--rs);font-size:12px;line-height:1.5;display:none}
-.toast.ok {background:var(--green-l);border:1px solid rgba(45,198,83,.2);color:#197a35;display:block}
-.toast.err{background:var(--red-l);border:1px solid rgba(230,57,70,.15);color:#b51a22;display:block}
+.upgrade-row-btn{
+  font-size:11.5px;font-weight:600;color:var(--amber);
+  background:none;border:none;cursor:pointer;padding:0;
+  font-family:inherit;white-space:nowrap;
+}
 
 /* Spinner */
-.sp{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite}
+.sp{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.15);border-top-color:#fff;border-radius:50%;animation:spin .65s linear infinite}
 </style>
 </head>
 <body>
 
-<!-- ══ ONBOARDING ═══════════════════════════════════ -->
-<div id="vOnboard" class="view">
-  <div class="wm">
-    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.65)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <span class="wm-name">Relay</span>
-    <span class="wm-chip">E2E ENCRYPTED</span>
-  </div>
-  <div class="ob-head">
-    <div class="ob-title">Bookmarks,<br>everywhere you browse.</div>
-    <div class="ob-sub">End-to-end encrypted. No email. Fully anonymous.</div>
-  </div>
-  <div class="ob-split">
-    <button class="ob-card" id="btnNewUser">
-      <div class="ob-ico">✨</div>
-      <div class="ob-ttl">New to Relay</div>
-      <div class="ob-dsc">Create your account</div>
-    </button>
-    <button class="ob-card" id="btnReturning">
-      <div class="ob-ico">🔑</div>
-      <div class="ob-ttl">Already use Relay</div>
-      <div class="ob-dsc">Sign in on this browser</div>
-    </button>
-  </div>
-  <div class="hint"><b>Fully anonymous.</b> No email, no phone, no personal info. Just a username and password you choose.</div>
-</div>
+<!-- SVG logo snippet reused across views -->
+<template id="logoSvg">
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.6)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</template>
 
-<!-- ══ SETUP ════════════════════════════════════════ -->
-<div id="vSetup" class="view">
-  <div class="wm">
-    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.65)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <span class="wm-name">Create account</span>
-  </div>
-
-  <!-- Username -->
-  <div style="font-size:12px;color:var(--t2);margin-bottom:6px;font-weight:500">Choose a username</div>
-  <div class="inp-wrap" style="margin-bottom:4px">
-    <input class="inp" id="unameInput" type="text" placeholder="e.g. swift-panda" autocomplete="username" spellcheck="false" autocorrect="off" autocapitalize="off">
-    <span class="inp-ico" id="unameIcon" style="cursor:default">·</span>
-  </div>
-
-  <!-- Availability status -->
-  <div class="uname-status" id="unameStatus" style="opacity:0">
-    <div class="uname-dot"></div>
-    <span id="unameMsg"></span>
-  </div>
-
-  <!-- Suggestions (shown when taken) -->
-  <div class="suggestions" id="suggestions" style="display:none"></div>
-
-  <!-- Password -->
-  <div style="font-size:12px;color:var(--t2);margin-bottom:6px;font-weight:500;margin-top:4px">Choose a password</div>
-  <div class="inp-wrap">
-    <input class="inp" id="passInput" type="password" placeholder="Make it strong…" autocomplete="new-password">
-    <button class="inp-ico" id="passEye">👁</button>
-  </div>
-  <div class="str-bars"><div class="str-bar" id="sb1"></div><div class="str-bar" id="sb2"></div><div class="str-bar" id="sb3"></div><div class="str-bar" id="sb4"></div></div>
-  <div class="str-lbl" id="strLbl"></div>
-
-  <div class="hint amber"><b>Remember both.</b> No recovery email — if you forget your username or password, your bookmarks can't be restored. We require a <b>Strong</b> password minimum.</div>
-
-  <button class="btn btn-blue" id="btnCreate" disabled>Create Account →</button>
-  <button class="btn btn-ghost" id="btnBackSetup">← Back</button>
-  <div class="toast" id="toastSetup"></div>
-</div>
-
-<!-- ══ MAIN ══════════════════════════════════════════ -->
-<div id="vMain" class="view">
-  <div class="wm">
-    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.65)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <span class="wm-name">Relay</span>
-    <span class="wm-chip" id="mainChip">FREE</span>
-  </div>
-
-  <!-- Upgrade row (hidden until limit hit) -->
-  <div id="upgradeRow" style="display:none;align-items:center;gap:10px;padding:10px 13px;background:#fffbf0;border:1px solid rgba(244,160,32,.25);border-radius:10px;margin-bottom:10px">
-    <span style="font-size:14px">⚡</span>
-    <div style="flex:1;font-size:12px;color:#a06000;line-height:1.4"><b>Free limit reached.</b> Upgrade to sync all bookmarks.</div>
-    <button id="upgradeRowBtn" style="font-size:12px;font-weight:600;color:#4361ee;background:none;border:none;cursor:pointer;padding:0;white-space:nowrap">Upgrade →</button>
-  </div>
-
-  <button class="orb-btn" id="btnSync">
-    <div class="orb-spin-ring"></div>
-    <div class="orb-icon" id="orbIco">⇄</div>
-    <div class="orb-label" id="orbLabel">Sync Now</div>
-    <div class="orb-sub" id="orbSub">Ready</div>
-  </button>
-
-  <div class="row">
-    <span class="row-ico">👤</span>
-    <div class="row-body">
-      <div class="row-text" id="mainUsername">—</div>
-      <div class="row-hint">Your anonymous identity</div>
-    </div>
-    <button class="row-action" id="btnSecurity">security ›</button>
-  </div>
-
-  <label class="tog" for="chkAuto">
-    <span style="font-size:15px;flex-shrink:0">⚡</span>
-    <div class="tog-body">
-      <div class="tog-text">Auto-sync</div>
-      <div class="tog-hint">Syncs when you add a bookmark</div>
-    </div>
-    <label class="ios"><input type="checkbox" id="chkAuto"><span class="ios-t"></span></label>
-  </label>
-  <div class="toast" id="toastMain"></div>
-</div>
-
-<!-- ══ SECURITY ══════════════════════════════════════ -->
-<div id="vSecurity" class="view">
-  <div class="wm">
-    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.65)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <span class="wm-name">How Relay protects you</span>
-  </div>
-  <div class="sec-card">
-    <div class="sec-hd"><span class="sec-ico">👤</span><span class="sec-title">Username</span></div>
-    <div class="sec-body">Hashed with SHA-256 to locate your vault. <b>Never stored in plaintext</b> — the database only sees a 64-char hash. Nobody can reverse it to find your username.</div>
-  </div>
-  <div class="sec-card">
-    <div class="sec-hd"><span class="sec-ico">🔑</span><span class="sec-title">Password</span></div>
-    <div class="sec-body">Encrypts your bookmarks using <b>AES-256-GCM</b> with PBKDF2 key derivation (310,000 iterations). Never stored or transmitted — only you know it.</div>
-  </div>
-  <div class="sec-card">
-    <div class="sec-hd"><span class="sec-ico">☁️</span><span class="sec-title">What's in the cloud</span></div>
-    <div class="sec-body">Only a <b>SHA-256 username hash</b> and an <b>encrypted blob</b>. Neither reveals who you are or what your bookmarks are.</div>
-  </div>
-  <div class="div"></div>
-  <button class="btn btn-blue" id="btnUpgrade" style="background:#4361ee">⚡ Upgrade to Pro — $18/year</button>
-  <button class="btn btn-ghost" id="btnShowGift" style="color:var(--blue);border-color:rgba(67,97,238,.2)">🎁 Redeem a gift code</button>
-  <button class="btn btn-ghost" id="btnLock">🔒 Sign out of this browser</button>
-  <button class="btn btn-ghost" style="color:#e63946;border-color:rgba(230,57,70,.2)" id="btnDeleteAccount">Delete account</button>
-  <button class="btn btn-ghost" id="btnBackMain">← Back</button>
-</div>
-
-<!-- ══ SIGN IN ════════════════════════════════════════ -->
+<!-- ══ SIGN IN ═══════════════════════════════ -->
 <div id="vSignIn" class="view">
   <div class="wm">
-    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.65)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.6)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     <span class="wm-name">Relay</span>
-    <span class="wm-chip">E2E ENCRYPTED</span>
   </div>
   <div class="su-head">
     <div class="su-illo">🔒</div>
     <div class="su-title">Welcome back</div>
-    <div class="su-sub">Sign in to sync your bookmarks.</div>
+    <div class="su-sub">Sign in to sync your bookmarks</div>
   </div>
   <div class="inp-wrap">
     <input class="inp" id="siUsername" type="text" placeholder="Username" autocomplete="username" spellcheck="false" autocorrect="off" autocapitalize="off">
   </div>
   <div class="inp-wrap">
     <input class="inp" id="siPassword" type="password" placeholder="Password" autocomplete="current-password">
-    <button class="inp-ico" id="siEye">👁</button>
+    <button class="inp-eye" id="siEye">👁</button>
   </div>
-  <button class="btn btn-blue" id="btnSignIn">Sign In &amp; Sync →</button>
+  <button class="btn btn-blue" id="btnSignIn">Sign In →</button>
   <div class="div"></div>
   <div style="text-align:center">
     <button class="btn btn-text" id="btnNewUserSignIn">New to Relay? Create account →</button>
@@ -428,55 +456,193 @@ body{
   <div class="toast" id="toastSignIn"></div>
 </div>
 
-<!-- ══ GIFT CODE ══════════════════════════════════════ -->
+<!-- ══ SETUP ═════════════════════════════════ -->
+<div id="vSetup" class="view">
+  <div class="wm">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.6)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <span class="wm-name">Create account</span>
+  </div>
+
+  <div style="font-size:11px;color:var(--t2);margin-bottom:6px;font-weight:500;letter-spacing:.2px;text-transform:uppercase">Username</div>
+  <div class="inp-wrap" style="margin-bottom:4px">
+    <input class="inp" id="unameInput" type="text" placeholder="e.g. swift-panda" autocomplete="username" spellcheck="false" autocorrect="off" autocapitalize="off">
+    <span class="inp-eye" id="unameIcon" style="cursor:default;font-size:12px">·</span>
+  </div>
+  <div class="uname-status" id="unameStatus">
+    <div class="uname-dot"></div>
+    <span id="unameMsg"></span>
+  </div>
+  <div class="suggestions" id="suggestions" style="display:none"></div>
+
+  <div style="font-size:11px;color:var(--t2);margin-bottom:6px;font-weight:500;letter-spacing:.2px;text-transform:uppercase;margin-top:4px">Password</div>
+  <div class="gen-box" id="genBox" style="display:none">
+    <span class="gen-text" id="genText"></span>
+    <div class="gen-actions">
+      <button class="gen-btn" id="btnRefresh" title="New">↻</button>
+      <button class="gen-btn" id="btnCopyGen" title="Copy">⎘</button>
+    </div>
+  </div>
+  <div class="inp-wrap">
+    <input class="inp" id="passInput" type="password" placeholder="Create a strong password…" autocomplete="new-password">
+    <button class="inp-eye" id="passEye">👁</button>
+  </div>
+  <div class="str-bars"><div class="str-bar" id="sb1"></div><div class="str-bar" id="sb2"></div><div class="str-bar" id="sb3"></div><div class="str-bar" id="sb4"></div></div>
+  <div class="str-lbl" id="strLbl"></div>
+
+  <div class="hint amber"><b>Write both down.</b> No recovery email — if you forget either, your bookmarks can't be restored.</div>
+
+  <button class="btn btn-blue" id="btnCreate" disabled>Create Account →</button>
+  <button class="btn btn-ghost" id="btnBackSetup">← Back</button>
+  <div class="toast" id="toastSetup"></div>
+</div>
+
+<!-- ══ MAIN ══════════════════════════════════ -->
+<div id="vMain" class="view">
+  <div class="wm">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.6)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <span class="wm-name">Relay</span>
+    <div class="wm-right">
+      <span class="plan-chip" id="mainChip">FREE</span>
+    </div>
+  </div>
+
+  <!-- Upgrade prompt (hidden until limit hit) -->
+  <div class="upgrade-row" id="upgradeRow">
+    <span style="font-size:13px">⚡</span>
+    <div style="flex:1;font-size:11.5px;color:var(--amber);line-height:1.4"><b>Limit reached.</b> Upgrade to sync all.</div>
+    <button class="upgrade-row-btn" id="upgradeRowBtn">Upgrade →</button>
+  </div>
+
+  <!-- Main sync button -->
+  <button class="sync-card" id="btnSync">
+    <div class="orb-row">
+      <div class="orb" id="mainOrb">
+        <div class="spin-ring"></div>
+        <span class="orb-ico" id="orbIco">⇄</span>
+      </div>
+    </div>
+    <div class="sync-title" id="orbLabel">Sync Now</div>
+    <div class="sync-sub"   id="orbSub">Ready</div>
+    <div class="sync-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  </button>
+
+  <div class="rows">
+    <div class="row">
+      <span class="row-ico">👤</span>
+      <div class="row-body">
+        <div class="row-label" id="mainUsername">—</div>
+        <div class="row-hint">Signed in</div>
+      </div>
+      <button class="row-action" id="btnSecurity">security ›</button>
+    </div>
+    <label class="tog" for="chkAuto">
+      <span style="font-size:13px;opacity:.7">⚡</span>
+      <div class="tog-body">
+        <div class="tog-label">Auto-sync</div>
+        <div class="tog-hint">Syncs when you add a bookmark</div>
+      </div>
+      <label class="ios"><input type="checkbox" id="chkAuto"><span class="ios-t"></span></label>
+    </label>
+  </div>
+  <div class="toast" id="toastMain"></div>
+</div>
+
+<!-- ══ SECURITY ══════════════════════════════ -->
+<div id="vSecurity" class="view">
+  <div class="wm">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.6)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <span class="wm-name">Security</span>
+  </div>
+
+  <div class="sec-card">
+    <div class="sec-hd"><span class="sec-ico">👤</span><span class="sec-title">Username</span></div>
+    <div class="sec-body">Hashed with PBKDF2 to locate your vault. <b>Never stored in plaintext</b> — the database only sees a derived key. Cannot be reversed.</div>
+  </div>
+  <div class="sec-card">
+    <div class="sec-hd"><span class="sec-ico">🔑</span><span class="sec-title">Password</span></div>
+    <div class="sec-body">Encrypts your bookmarks with <b>AES-256-GCM</b>. Never stored or transmitted. Only you know it.</div>
+  </div>
+  <div class="sec-card">
+    <div class="sec-hd"><span class="sec-ico">☁️</span><span class="sec-title">What's in the cloud</span></div>
+    <div class="sec-body">Only a <b>derived key hash</b> and an <b>encrypted blob</b>. Nobody — including Relay — can read your bookmarks.</div>
+  </div>
+
+  <div class="div"></div>
+  <button class="btn btn-blue" id="btnUpgrade">⚡ Upgrade to Pro — $18/year</button>
+  <button class="btn btn-ghost" id="btnShowGift" style="color:#8ba3ff;border-color:rgba(79,110,247,.2)">🎁 Redeem a gift code</button>
+  <button class="btn btn-ghost" id="btnLock">Sign out of this browser</button>
+  <button class="btn btn-danger" id="btnDeleteAccount">Delete account</button>
+  <button class="btn btn-ghost" id="btnBackMain">← Back</button>
+</div>
+
+<!-- ══ GIFT CODE ══════════════════════════════ -->
 <div id="vGift" class="view">
   <div class="wm">
-    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.65)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.6)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     <span class="wm-name">Relay</span>
   </div>
   <div class="su-head">
-    <div class="su-illo" style="background:rgba(67,97,238,.08);border-color:rgba(67,97,238,.15)">🎁</div>
+    <div class="su-illo">🎁</div>
     <div class="su-title">Redeem gift code</div>
-    <div class="su-sub">Enter your gift code to activate Relay Pro.</div>
+    <div class="su-sub">Enter your code to activate Relay Pro</div>
   </div>
   <div class="inp-wrap">
     <input class="inp" id="giftInput" type="text" placeholder="XXXX-XXXX-XXXX"
       autocomplete="off" spellcheck="false" autocapitalize="characters"
-      style="font-family:ui-monospace,monospace;font-size:16px;font-weight:700;letter-spacing:2px;text-align:center;text-transform:uppercase">
+      style="font-family:ui-monospace,monospace;font-size:15px;font-weight:700;letter-spacing:3px;text-align:center;text-transform:uppercase">
   </div>
   <button class="btn btn-blue" id="btnRedeemGift">Redeem →</button>
   <button class="btn btn-ghost" id="btnBackGift">← Back</button>
   <div class="toast" id="toastGift"></div>
 </div>
 
-<!-- ══ DELETE CONFIRM ══════════════════════════════════ -->
+<!-- ══ DELETE CONFIRM ════════════════════════ -->
 <div id="vDeleteConfirm" class="view">
   <div class="wm">
-    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.65)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.6)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     <span class="wm-name">Delete account</span>
   </div>
   <div class="su-head">
-    <div class="su-illo" style="background:rgba(230,57,70,.08);border-color:rgba(230,57,70,.15)">🗑️</div>
+    <div class="su-illo" style="background:rgba(242,109,109,.08);border-color:rgba(242,109,109,.2)">🗑️</div>
     <div class="su-title">Are you sure?</div>
-    <div class="su-sub">This will permanently delete your encrypted vault from the cloud. Your local bookmarks are <b>not</b> affected.</div>
+    <div class="su-sub">This permanently deletes your encrypted vault. Your local bookmarks are unaffected.</div>
   </div>
-  <div class="hint amber" style="margin-bottom:16px">
-    <b>This cannot be undone.</b> Your synced bookmarks in the cloud will be gone. If you have a Pro subscription, please cancel it in Stripe first.
-  </div>
-  <button class="btn" style="background:#e63946;color:#fff;box-shadow:0 2px 8px rgba(230,57,70,.3);margin-bottom:8px" id="btnDeleteConfirm">Yes, delete everything</button>
+  <div class="hint amber" style="margin-bottom:16px"><b>Cannot be undone.</b> If you have a Pro subscription, cancel it in Stripe first.</div>
+  <button class="btn btn-danger" style="font-size:14px;padding:13px;margin-bottom:8px" id="btnDeleteConfirm">Yes, delete everything</button>
   <button class="btn btn-ghost" id="btnDeleteCancel">Cancel</button>
   <div class="toast" id="toastDelete"></div>
 </div>
 
-<!-- ══ DELETED ══════════════════════════════════════════ -->
-<div id="vDeleted" class="view" style="text-align:center">
-  <div class="wm" style="justify-content:center">
-    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.65)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+<!-- ══ DELETED ═══════════════════════════════ -->
+<div id="vDeleted" class="view" style="text-align:center;padding-top:40px">
+  <div style="font-size:44px;margin-bottom:16px">✓</div>
+  <div style="font-size:18px;font-weight:700;margin-bottom:8px;letter-spacing:-.3px">Account deleted</div>
+  <div style="font-size:12.5px;color:var(--t2);line-height:1.65">Your vault has been removed.<br>Local bookmarks are untouched.</div>
+</div>
+
+<!-- ══ ONBOARDING ════════════════════════════ -->
+<div id="vOnboard" class="view">
+  <div class="wm">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.6)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     <span class="wm-name">Relay</span>
   </div>
-  <div style="font-size:40px;margin-bottom:16px">✓</div>
-  <div style="font-size:17px;font-weight:700;margin-bottom:8px">Account deleted</div>
-  <div style="font-size:13px;color:var(--t2);line-height:1.6">Your vault has been removed from our servers. Your local bookmarks are untouched. Redirecting…</div>
+  <div class="ob-head">
+    <div class="ob-title">Bookmarks,<br>everywhere.</div>
+    <div class="ob-sub">End-to-end encrypted sync across Chrome, Edge, and Safari. No email. Fully anonymous.</div>
+  </div>
+  <div class="ob-split">
+    <button class="ob-card" id="btnNewUser">
+      <div class="ob-ico">✨</div>
+      <div class="ob-ttl">New to Relay</div>
+      <div class="ob-dsc">Create an account</div>
+    </button>
+    <button class="ob-card" id="btnReturning">
+      <div class="ob-ico">🔑</div>
+      <div class="ob-ttl">Have an account</div>
+      <div class="ob-dsc">Sign in</div>
+    </button>
+  </div>
+  <div class="hint"><b>Private by design.</b> Your bookmarks are encrypted before leaving your device. We can't read them.</div>
 </div>
 
 <script src="config.js"></script>
