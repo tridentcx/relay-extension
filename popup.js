@@ -83,9 +83,21 @@ function pwHint(p) {
 
 function renderStrength(p) {
   const s=pwStrength(p);
-  const cols=['#2a2a3a','#f26d6d','#f5a623','#3ecf6e','#3ecf6e'];
-  const lbls=['','Weak — not accepted','Almost — a bit stronger','Strong ✓','Very strong ✓'];
-  for(let i=1;i<=4;i++){const b=q(`sb${i}`);if(b) b.style.background=i<=s?cols[s]:'rgba(255,255,255,.07)';}
+  // Use CSS tokens that adapt to light/dark mode
+  const root=getComputedStyle(document.documentElement);
+  const empty=root.getPropertyValue('--bdr').trim()||'rgba(0,0,0,0.08)';
+  const cols=[
+    empty,
+    root.getPropertyValue('--red').trim()||'#d70015',
+    root.getPropertyValue('--amber').trim()||'#b56600',
+    root.getPropertyValue('--green').trim()||'#28a745',
+    root.getPropertyValue('--green').trim()||'#28a745',
+  ];
+  const lbls=['','Weak — not accepted','Almost — a bit stronger','Strong','Very strong'];
+  for(let i=1;i<=4;i++){
+    const b=q(`sb${i}`);
+    if(b) b.style.background=i<=s?cols[s]:empty;
+  }
   const l=q('strLbl');
   if(l){const h=pwHint(p);l.textContent=p?(h||lbls[s]):'';l.style.color=cols[s];}
 }
@@ -126,7 +138,13 @@ function eye(inpId,btnId){
 }
 
 const clrT=(id)=>{const e=q(id);if(e)e.className='toast';};
-const toast=(id,msg,t)=>{const e=q(id);if(!e)return;e.textContent=msg;e.className=`toast ${t}`;};
+const toast=(id,msg,t)=>{
+  const e=q(id);if(!e)return;
+  e.textContent=msg;e.className=`toast ${t}`;
+  // Auto-dismiss after 5s for errors, 3s for success
+  if(e._dismissTimer)clearTimeout(e._dismissTimer);
+  e._dismissTimer=setTimeout(()=>{e.className='toast';},t==='err'?5000:3000);
+};
 
 function age(iso){
   if(!iso)return '—';
@@ -237,10 +255,17 @@ async function runSync(username, password){
       q('orbIco').textContent='⚡';
       q('orbLabel').textContent='Browser limit reached';
       q('orbSub').textContent='Free plan supports 2 browsers';
-      toast('toastMain','You\'re using 2 browsers already. Upgrade to Pro for unlimited.','err');
-      const al=q('upgradeAlert');if(al)al.classList.add('show');
+      toast('toastMain','Free tier supports 2 browsers. Upgrade to add more.','err');
+      // Show alert card with upgrade CTA
+      const al=q('upgradeAlert');
+      if(al){
+        al.classList.add('show');
+        // Override the alert text
+        const txt=al.querySelector('.alert-text');
+        if(txt)txt.innerHTML='<b>Browser limit reached.</b>';
+      }
       btn.classList.remove('error');
-      setTimeout(()=>{btn.disabled=false;if(orb)orb.className='orb';q('orbIco').textContent='⇄';q('orbLabel').textContent='Try Again';},2200);
+      setTimeout(()=>{btn.disabled=false;if(orb)orb.className='orb';q('orbIco').textContent='⇄';q('orbLabel').textContent='Try Again';q('orbSub').textContent='';},2200);
       return;
     }
 
@@ -391,6 +416,11 @@ function updateCreate(){
 q('siEye').addEventListener('click',()=>eye('siPassword','siEye'));
 
 // FIX [C4]: Keyboard navigation
+// Auto-lowercase + trim username as user types
+q('siUsername').addEventListener('input',e=>{
+  const cleaned=e.target.value.toLowerCase().trim();
+  if(e.target.value!==cleaned)e.target.value=cleaned;
+});
 q('siUsername').addEventListener('keydown',e=>{if(e.key==='Enter')q('siPassword').focus();});
 q('siPassword').addEventListener('keydown',e=>{if(e.key==='Enter')q('btnSignIn').click();});
 
@@ -440,6 +470,9 @@ q('btnSignIn').addEventListener('click',async()=>{
   }catch(err){
     toast('toastSignIn',err.message,'err');
     await clearSession();
+    // Clear password but keep username so they can retry
+    q('siPassword').value='';
+    q('siPassword').focus();
   }finally{
     btn.disabled=false;
     btn.innerHTML='Sign In →';
@@ -472,6 +505,7 @@ q('unameInput').addEventListener('keydown',e=>{if(e.key==='Enter')q('passInput')
 q('passEye').addEventListener('click',()=>eye('passInput','passEye'));
 q('passConfirmEye').addEventListener('click',()=>eye('passConfirm','passConfirmEye'));
 
+q('passInput').addEventListener('keydown',e=>{if(e.key==='Enter')q('passConfirm').focus();});
 q('passInput').addEventListener('input',()=>{
   const p=q('passInput').value;
   q('genText').textContent=p||'…';
@@ -569,14 +603,15 @@ q('accountRow')?.addEventListener('click',()=>show('vSecurity'));
 q('btnSecurity')?.addEventListener('click',e=>{e.stopPropagation();show('vSecurity');});
 
 q('chkAuto').addEventListener('change',async e=>{
-  // Auto-sync is a Pro feature. Free users can toggle but it won't actually run.
   const {plan}=await chrome.storage.local.get('plan');
   if(e.target.checked && plan!=='pro'){
+    // Revert immediately and warn
     e.target.checked=false;
-    toast('toastMain','Auto-sync is a Pro feature. Upgrade to enable.','err');
+    toast('toastMain','Auto-sync is a Pro feature. Upgrade to enable it.','err');
+    setTimeout(()=>clrT('toastMain'),3500);
     return;
   }
-  chrome.storage.local.set({autoSync:e.target.checked});
+  await chrome.storage.local.set({autoSync:e.target.checked});
 });
 
 q('upgradeAlertBtn')?.addEventListener('click',()=>chrome.tabs.create({url:PRICING_URL}));
@@ -651,7 +686,13 @@ q('btnRestoreConfirm')?.addEventListener('click',async()=>{
     const {restored,count}=await restoreFromSnapshot(pendingRestoreId,p,vk);
     await chrome.storage.local.set({bmCount:count,lastSync:new Date().toISOString()});
     toast('toastRestore',`Restored ${restored} bookmarks. Total: ${count}.`,'ok');
-    setTimeout(()=>{pendingRestoreId=null;show('vMain');},1800);
+    setTimeout(async()=>{
+      pendingRestoreId=null;
+      // Refresh main view with new count
+      showStats(count, new Date().toISOString());
+      q('orbSub').textContent=`Synced · just now`;
+      show('vMain');
+    },1800);
   }catch(err){
     toast('toastRestore',err.message,'err');
   }finally{
@@ -667,6 +708,17 @@ q('btnLock').addEventListener('click',async()=>{
   const {browserId}=await chrome.storage.local.get('browserId');
   await chrome.storage.local.clear();
   if(browserId) await chrome.storage.local.set({browserId});
+
+  // Clear stale UI state so previous account's data doesn't briefly flash
+  q('mainUsername').textContent='—';
+  q('mainPlanHint').textContent='Free plan';
+  q('statCount').textContent='—';
+  q('statTime').textContent='—';
+  q('syncStats')?.classList.remove('visible');
+  q('orbLabel').textContent='Sync Now';
+  q('orbSub').textContent='Tap to sync your bookmarks';
+  applyPlan('free');
+
   show('vSignIn');
 });
 q('btnDeleteAccount')?.addEventListener('click',()=>show('vDeleteConfirm'));
@@ -789,6 +841,13 @@ q('btnDeleteConfirm')?.addEventListener('click',async()=>{
 // Init
 // ─────────────────────────────────────────────────────────────────────
 async function init(){
+  // Show version from manifest
+  try{
+    const v=chrome.runtime.getManifest().version;
+    const lbl=q('versionLabel');
+    if(lbl) lbl.textContent=`Relay v${v}`;
+  }catch{}
+
   await loadSession();
   const {hasAccount}=await chrome.storage.local.get('hasAccount');
   if(!hasAccount){show('vSignIn');return;}
