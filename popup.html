@@ -1128,6 +1128,7 @@ body {
   </div>
   <button class="btn btn-primary" id="btnUpgrade">Upgrade to Pro — $18/year</button>
   <button class="btn btn-tinted" id="btnShowGift">🎁 Redeem gift code</button>
+  <button class="btn btn-tinted" id="btnShowHistory" style="display:none">📅 Sync history</button>
 
   <!-- Privacy section -->
   <div class="section-header">Privacy & Security</div>
@@ -1214,5 +1215,38 @@ body {
 <script src="crypto.js"></script>
 <script src="sync.js"></script>
 <script src="popup.js"></script>
+
+<!-- ══ HISTORY (Pro feature) ════════════════════════════════════════ -->
+<div id="vHistory" class="view">
+  <div class="nav">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.6)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <span class="nav-title">Sync History</span>
+    <div class="nav-right"><button class="done-btn" id="btnBackHistory">Done</button></div>
+  </div>
+  <div class="section-header">Last 30 Days</div>
+  <div class="list-section" id="historyList" style="overflow:hidden"></div>
+  <div class="section-footer">Tap any snapshot to restore it. Your current bookmarks will be merged with the snapshot — nothing is lost.</div>
+</div>
+
+<!-- ══ RESTORE CONFIRM ═════════════════════════════════════════════ -->
+<div id="vRestoreConfirm" class="view">
+  <div class="nav">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h12M16 8l-3-3M16 8l-3 3" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 16H8M8 16l3-3M8 16l3 3" stroke="rgba(255,255,255,.6)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <span class="nav-title">Restore</span>
+    <div class="nav-right"><button class="done-btn" id="btnRestoreCancel">Cancel</button></div>
+  </div>
+  <div class="hero">
+    <div class="hero-icon">↶</div>
+    <div class="hero-title">Restore this snapshot?</div>
+    <div class="hero-sub">Bookmarks from this snapshot will be merged with your current ones. Nothing is deleted.</div>
+  </div>
+  <div class="notice info">
+    <b>Safe to restore.</b> Any URLs from the snapshot that aren't in your current bookmarks will be added back.
+  </div>
+  <button class="btn btn-primary" id="btnRestoreConfirm">Restore this snapshot</button>
+  <button class="btn btn-secondary" id="btnRestoreCancel2">Cancel</button>
+  <div class="toast" id="toastRestore"></div>
+</div>
+
 </body>
 </html>

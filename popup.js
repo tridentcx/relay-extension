@@ -146,6 +146,17 @@ const PRICING_URL='https://shahakshat14.github.io/relay-extension/pricing/';
 function applyPlan(plan){
   const isPro = plan==='pro';
 
+  // Show/hide history button based on plan
+  const histBtn=q('btnShowHistory');
+  if(histBtn) histBtn.style.display=isPro?'flex':'none';
+
+  // Visually dim auto-sync toggle for free users
+  const autoTog=q('chkAuto')?.closest('.list-row');
+  if(autoTog){
+    autoTog.style.opacity=isPro?'1':'0.55';
+  }
+
+
   // Update all chips
   ['mainChip','secChip'].forEach(id=>{
     const el=q(id);
@@ -220,6 +231,16 @@ async function runSync(username, password){
       const al=q('upgradeAlert');if(al)al.classList.add('show');
       btn.classList.remove('error');
       setTimeout(()=>{btn.disabled=false;if(orb)orb.className='orb';q('orbIco').textContent='⇄';},1500);
+      return;
+    }
+    if(err.message.startsWith('BROWSER_LIMIT:')){
+      q('orbIco').textContent='⚡';
+      q('orbLabel').textContent='Browser limit reached';
+      q('orbSub').textContent='Free plan supports 2 browsers';
+      toast('toastMain','You\'re using 2 browsers already. Upgrade to Pro for unlimited.','err');
+      const al=q('upgradeAlert');if(al)al.classList.add('show');
+      btn.classList.remove('error');
+      setTimeout(()=>{btn.disabled=false;if(orb)orb.className='orb';q('orbIco').textContent='⇄';q('orbLabel').textContent='Try Again';},2200);
       return;
     }
 
@@ -512,7 +533,14 @@ q('btnSync').addEventListener('click',()=>{
 q('accountRow')?.addEventListener('click',()=>show('vSecurity'));
 q('btnSecurity')?.addEventListener('click',e=>{e.stopPropagation();show('vSecurity');});
 
-q('chkAuto').addEventListener('change',e=>{
+q('chkAuto').addEventListener('change',async e=>{
+  // Auto-sync is a Pro feature. Free users can toggle but it won't actually run.
+  const {plan}=await chrome.storage.local.get('plan');
+  if(e.target.checked && plan!=='pro'){
+    e.target.checked=false;
+    toast('toastMain','Auto-sync is a Pro feature. Upgrade to enable.','err');
+    return;
+  }
   chrome.storage.local.set({autoSync:e.target.checked});
 });
 
@@ -527,6 +555,73 @@ q('upgTeaser')?.addEventListener('click',()=>chrome.tabs.create({url:PRICING_URL
 
 q('btnShowGift')?.addEventListener('click',()=>{
   clrT('toastGift');q('giftInput').value='';show('vGift');
+});
+
+// ── History (Pro only) ──────────────────────────────────────────────
+q('btnShowHistory')?.addEventListener('click',async()=>{
+  const {plan}=await chrome.storage.local.get('plan');
+  if(plan!=='pro'){
+    toast('toastMain','Sync history is a Pro feature.','err');
+    return;
+  }
+  show('vHistory');
+  q('historyList').innerHTML='<div style="text-align:center;color:var(--t-2);padding:20px">Loading…</div>';
+  try{
+    const u=getU();
+    const vk=await vaultKey(u);
+    const list=await listHistory(vk);
+    if(list.length===0){
+      q('historyList').innerHTML='<div style="text-align:center;color:var(--t-2);padding:20px">No history yet. Sync to start tracking.</div>';
+      return;
+    }
+    q('historyList').innerHTML=list.map(s=>{
+      const date=new Date(s.created_at);
+      const ago=age(s.created_at);
+      const dt=date.toLocaleDateString([],{month:'short',day:'numeric'})+' '+date.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      return `<button class="list-row" data-id="${s.id}">
+        <div class="row-icon">📅</div>
+        <div class="row-content">
+          <div class="row-title">${dt}</div>
+          <div class="row-subtitle">${s.bookmark_count} bookmarks · ${ago}</div>
+        </div>
+        <div class="row-trailing">↶</div>
+      </button>`;
+    }).join('');
+    q('historyList').querySelectorAll('button[data-id]').forEach(b=>{
+      b.addEventListener('click',()=>confirmRestore(b.dataset.id));
+    });
+  }catch(err){
+    q('historyList').innerHTML=`<div style="color:var(--red);padding:20px;text-align:center">${err.message}</div>`;
+  }
+});
+
+q('btnBackHistory')?.addEventListener('click',()=>show('vSecurity'));
+
+let pendingRestoreId=null;
+function confirmRestore(id){
+  pendingRestoreId=id;
+  show('vRestoreConfirm');
+}
+
+q('btnRestoreCancel')?.addEventListener('click',()=>{pendingRestoreId=null;show('vHistory');});
+q('btnRestoreCancel2')?.addEventListener('click',()=>{pendingRestoreId=null;show('vHistory');});
+
+q('btnRestoreConfirm')?.addEventListener('click',async()=>{
+  if(!pendingRestoreId)return;
+  const btn=q('btnRestoreConfirm');
+  btn.disabled=true;btn.innerHTML='<span class="sp"></span> Restoring…';
+  try{
+    const u=getU(),p=getP();
+    const vk=await vaultKey(u);
+    const {restored,count}=await restoreFromSnapshot(pendingRestoreId,p,vk);
+    await chrome.storage.local.set({bmCount:count,lastSync:new Date().toISOString()});
+    toast('toastRestore',`Restored ${restored} bookmarks. Total: ${count}.`,'ok');
+    setTimeout(()=>{pendingRestoreId=null;show('vMain');},1800);
+  }catch(err){
+    toast('toastRestore',err.message,'err');
+  }finally{
+    btn.disabled=false;btn.innerHTML='Restore this snapshot';
+  }
 });
 
 q('btnLock').addEventListener('click',()=>{clearSession();show('vSignIn');});

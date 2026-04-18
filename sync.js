@@ -214,13 +214,81 @@ async function getPlan(vaultId) {
   }
 }
 
+
+// ─── Browser identity (random ID stored in chrome.storage.local) ─────
+async function getBrowserId() {
+  const { browserId } = await chrome.storage.local.get('browserId');
+  if (browserId) return browserId;
+  const id = crypto.randomUUID();
+  await chrome.storage.local.set({ browserId: id });
+  return id;
+}
+
+// ─── Register this browser with the vault, enforcing limits ─────────
+async function registerBrowser(vaultId) {
+  if (!isValidVaultKey(vaultId)) return { allowed: false, reason: 'invalid' };
+  const browserId = await getBrowserId();
+  const ua        = navigator.userAgent.slice(0, 250);
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/register_browser`, {
+      method: 'POST',
+      headers: {
+        'apikey':        SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type':  'application/json',
+      },
+      body: JSON.stringify({
+        p_vault_key:  vaultId,
+        p_browser_id: browserId,
+        p_ua:         ua,
+      }),
+    });
+    if (!res.ok) return { allowed: true, reason: 'rpc_error' };  // fail open
+    return await res.json();
+  } catch {
+    return { allowed: true, reason: 'network' };
+  }
+}
+
+// ─── Save a snapshot to sync_history (Pro only) ─────────────────────
+async function saveSnapshot(vaultId, encryptedBlob, count) {
+  if (!isValidVaultKey(vaultId)) return;
+  try {
+    await supabase('POST', 'sync_history', {
+      vault_key: vaultId,
+      data: encryptedBlob,
+      bookmark_count: count,
+    });
+  } catch {} // history is best-effort, never block sync
+}
+
+// ─── Fetch sync history (last 30 days) ──────────────────────────────
+async function listHistory(vaultId) {
+  if (!isValidVaultKey(vaultId)) return [];
+  try {
+    const cutoff = new Date(Date.now() - 30 * 86400_000).toISOString();
+    return await supabase('GET',
+      `sync_history?vault_key=eq.${vaultId}&created_at=gte.${cutoff}&order=created_at.desc&select=id,bookmark_count,created_at,data&limit=50`
+    ) || [];
+  } catch {
+    return [];
+  }
+}
+
 // ── Main bidirectional sync ───────────────────────────────────────────
 async function doSync(username, password) {
   const vaultId = await vaultKey(username);
 
-  // Check plan
+  // Check plan first — needed for browser limit decision
   const planInfo = await getPlan(vaultId);
   const isPro    = planInfo.effective_plan === 'pro';
+
+  // Register this browser. Free tier capped at 2.
+  const reg = await registerBrowser(vaultId);
+  if (!reg.allowed && reg.reason === 'free_browser_limit') {
+    throw new Error(`BROWSER_LIMIT:${reg.count}`);
+  }
 
   const remote = await pullFromCloud(vaultId);
   let pulled = 0;
@@ -251,8 +319,31 @@ async function doSync(username, password) {
   }
 
   const blob = await encrypt(JSON.stringify(snapshot), password);
-  // FIX [MED-3]: Pass remote updated_at to detect concurrent writes
   await pushToCloud(vaultId, blob, remote?.updated_at);
 
+  // Save to history (Pro only) — non-blocking
+  if (isPro) {
+    saveSnapshot(vaultId, blob, snapshot.count);
+  }
+
   return { pulled, count: snapshot.count, plan: planInfo.effective_plan };
+}
+
+// ── Restore from a history snapshot (Pro feature) ────────────────────
+async function restoreFromSnapshot(snapshotId, password, vaultId) {
+  if (!isValidVaultKey(vaultId)) throw new Error('Invalid vault.');
+  const rows = await supabase('GET',
+    `sync_history?id=eq.${snapshotId}&select=data&limit=1`);
+  if (!rows || rows.length === 0) throw new Error('Snapshot not found.');
+
+  const plaintext = await decrypt(rows[0].data, password);
+  const data      = JSON.parse(plaintext);
+  const added     = await applyRemote(data);
+
+  // After restore, push the merged state back so all browsers get it
+  const snapshot = await getLocalSnapshot();
+  const blob     = await encrypt(JSON.stringify(snapshot), password);
+  await pushToCloud(vaultId, blob);
+
+  return { restored: added, count: snapshot.count };
 }
