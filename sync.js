@@ -89,7 +89,7 @@ async function clearAuthToken() {
 // FIX [MED-3]: Push with optimistic concurrency check.
 // If lastSeenUpdatedAt is provided, only patch when DB still has that timestamp.
 async function pushToCloud(vaultId, encryptedBlob, lastSeenUpdatedAt) {
-  if (!isValidVaultKey(vaultId)) throw new Error('Invalid vault key.');
+  if (!window._relayCrypto.isValidVaultKey(vaultId)) throw new Error('Invalid vault key.');
   // Include write_token for server-side ownership verification
   const { writeToken } = await chrome.storage.local.get('writeToken');
   const body = {
@@ -138,7 +138,7 @@ async function pushToCloud(vaultId, encryptedBlob, lastSeenUpdatedAt) {
 }
 
 async function pullFromCloud(vaultId) {
-  if (!isValidVaultKey(vaultId)) throw new Error('Invalid vault key.');
+  if (!window._relayCrypto.isValidVaultKey(vaultId)) throw new Error('Invalid vault key.');
   const rows = await supabase('GET', `vaults?vault_key=eq.${vaultId}&select=data,updated_at,write_token`);
   if (!rows || rows.length === 0) return null;
   // Cache write_token locally if we don't have it yet
@@ -285,7 +285,7 @@ async function applyRemote(data) {
 
 // ── Availability check ────────────────────────────────────────────────
 async function checkUsernameAvailable(username) {
-  const key  = await vaultKey(username);
+  const key  = await window._relayCrypto.vaultKey(username);
   const rows = await supabase('GET', `vaults?vault_key=eq.${key}&select=vault_key`);
   return !rows || rows.length === 0;
 }
@@ -294,7 +294,7 @@ async function checkUsernameAvailable(username) {
 // FREE_BOOKMARK_LIMIT now comes from remote config — see getConfig()
 
 async function getPlan(vaultId) {
-  if (!isValidVaultKey(vaultId)) return { effective_plan: 'free', bookmark_count: 0 };
+  if (!window._relayCrypto.isValidVaultKey(vaultId)) return { effective_plan: 'free', bookmark_count: 0 };
   try {
     const rows = await supabase('GET', `vault_plan?vault_key=eq.${vaultId}&select=effective_plan,bookmark_count`);
     return rows?.[0] ?? { effective_plan: 'free', bookmark_count: 0 };
@@ -315,7 +315,7 @@ async function getBrowserId() {
 
 // ─── Register this browser with the vault, enforcing limits ─────────
 async function registerBrowser(vaultId) {
-  if (!isValidVaultKey(vaultId)) return { allowed: false, reason: 'invalid' };
+  if (!window._relayCrypto.isValidVaultKey(vaultId)) return { allowed: false, reason: 'invalid' };
   const browserId = await getBrowserId();
   const ua        = navigator.userAgent.slice(0, 250);
 
@@ -342,7 +342,7 @@ async function registerBrowser(vaultId) {
 
 // ─── Save a snapshot to sync_history (Pro only) ─────────────────────
 async function saveSnapshot(vaultId, encryptedBlob, count) {
-  if (!isValidVaultKey(vaultId)) return;
+  if (!window._relayCrypto.isValidVaultKey(vaultId)) return;
   try {
     await supabase('POST', 'sync_history', {
       vault_key: vaultId,
@@ -354,7 +354,7 @@ async function saveSnapshot(vaultId, encryptedBlob, count) {
 
 // ─── Fetch sync history (last 30 days) ──────────────────────────────
 async function listHistory(vaultId) {
-  if (!isValidVaultKey(vaultId)) return [];
+  if (!window._relayCrypto.isValidVaultKey(vaultId)) return [];
   try {
     const cutoff = new Date(Date.now() - 30 * 86400_000).toISOString();
     return await supabase('GET',
@@ -367,7 +367,7 @@ async function listHistory(vaultId) {
 
 // ── Main bidirectional sync ───────────────────────────────────────────
 async function doSync(username, password, accountSalt) {
-  const vaultId = await vaultKey(username, accountSalt);
+  const vaultId = await window._relayCrypto.vaultKey(username, accountSalt);
 
   // Rate limiter is deployed separately via Edge Function.
   // Removed from sync path until function is confirmed deployed.
@@ -388,7 +388,7 @@ async function doSync(username, password, accountSalt) {
   if (remote?.data) {
     let plaintext = null;
     try {
-      plaintext = await decrypt(remote.data, password);
+      plaintext = await window._relayCrypto.decrypt(remote.data, password);
     } catch {
       // Wrong password — exit with consistent error
       throw new Error('Wrong password or corrupted data. Check your credentials.');
@@ -415,7 +415,7 @@ async function doSync(username, password, accountSalt) {
     throw new Error(`FREE_LIMIT:${snapshot.count}`);
   }
 
-  const blob = await encrypt(JSON.stringify(snapshot), password);
+  const blob = await window._relayCrypto.encrypt(JSON.stringify(snapshot), password);
   await pushToCloud(vaultId, blob, remote?.updated_at);
 
   // Save to history (Pro only) — non-blocking
@@ -430,7 +430,7 @@ async function doSync(username, password, accountSalt) {
 // FIX [M-13]: Validate decrypt + parse fully BEFORE any merge happens.
 // If anything fails, no bookmarks are touched.
 async function restoreFromSnapshot(snapshotId, password, vaultId) {
-  if (!isValidVaultKey(vaultId)) throw new Error('Invalid vault.');
+  if (!window._relayCrypto.isValidVaultKey(vaultId)) throw new Error('Invalid vault.');
   // Sanitize snapshot ID: should be UUID
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(snapshotId))) throw new Error('Invalid snapshot ID.');
 
@@ -441,7 +441,7 @@ async function restoreFromSnapshot(snapshotId, password, vaultId) {
   // Step 1: Decrypt — fail fast if password wrong (nothing modified yet)
   let plaintext;
   try {
-    plaintext = await decrypt(rows[0].data, password);
+    plaintext = await window._relayCrypto.decrypt(rows[0].data, password);
   } catch {
     throw new Error('Cannot decrypt snapshot. Password may have changed since this was saved.');
   }
@@ -464,7 +464,7 @@ async function restoreFromSnapshot(snapshotId, password, vaultId) {
 
   // Push the merged state back
   const snapshot = await getLocalSnapshot();
-  const blob     = await encrypt(JSON.stringify(snapshot), password);
+  const blob     = await window._relayCrypto.encrypt(JSON.stringify(snapshot), password);
   await pushToCloud(vaultId, blob);
 
   return { restored: added, count: snapshot.count };
