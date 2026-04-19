@@ -72,7 +72,11 @@ async function ensureAuth() {
       headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
     });
-    if (!res.ok) return SUPABASE_KEY; // fail open
+    if (!res.ok) {
+      const errText = await res.text().catch(() => `HTTP ${res.status}`);
+      console.warn('[Relay] Anonymous auth failed:', res.status, errText);
+      return SUPABASE_KEY;
+    }
     const data = await res.json();
     if (data.access_token) {
       await chrome.storage.local.set({
@@ -80,10 +84,13 @@ async function ensureAuth() {
         relayRefreshToken: data.refresh_token || '',
         relayAuthUserId:   data.user?.id || '',
       });
+      console.log('[Relay] Auth OK, user:', data.user?.id);
       return data.access_token;
     }
-  } catch {
-    // Auth failed — fall back to anon key (still works for legacy vaults)
+    // Response was OK but no access_token — log the full response
+    console.warn('[Relay] Auth response had no access_token:', JSON.stringify(data));
+  } catch (err) {
+    console.warn('[Relay] Auth exception:', err?.message);
   }
   return SUPABASE_KEY;
 }
@@ -423,27 +430,8 @@ async function doSync(username, password, accountSalt) {
   // Non-blocking — runs in background, doesn't affect sync success.
   claimVault(vaultId);
 
-  // Rate limit check — non-blocking, fail open if Edge Function unavailable
-  try {
-    const token = await ensureAuth();
-    const rl = await fetch(`${SUPABASE_URL}/functions/v1/sync-rate-limiter`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ vault_key: vaultId }),
-    });
-    if (rl.status === 429) {
-      const data = await rl.json().catch(() => ({}));
-      const window = data.window === 'minute' ? 'minute' : 'hour';
-      throw new Error(`RATE_LIMIT:${window}`);
-    }
-  } catch (e) {
-    // Only rethrow if it's our rate limit error, not a network failure
-    if (e.message?.startsWith('RATE_LIMIT:')) throw e;
-    // Otherwise fall through — fail open
-  }
+  // Rate limiter is deployed separately via Edge Function.
+  // Removed from sync path until function is confirmed deployed.
 
   // Check plan first — needed for browser limit decision
   const planInfo = await getPlan(vaultId);
