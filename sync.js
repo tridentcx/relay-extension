@@ -66,13 +66,13 @@ async function ensureAuth() {
       }
     }
 
-    // No session — create anonymous user
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+    // No session — create anonymous user via the correct grant type endpoint
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=anonymous`, {
       method: 'POST',
       headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify({}), // anonymous = no email/password
+      body: JSON.stringify({}),
     });
-    if (!res.ok) return SUPABASE_KEY; // fail open, use anon key
+    if (!res.ok) return SUPABASE_KEY; // fail open
     const data = await res.json();
     if (data.access_token) {
       await chrome.storage.local.set({
