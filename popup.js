@@ -192,7 +192,7 @@ function age(iso){
 // ─────────────────────────────────────────────────────────────────────
 // Plan UI helpers
 // ─────────────────────────────────────────────────────────────────────
-const PRICING_URL='https://shahakshat14.github.io/relay-extension/pricing/';
+const PRICING_URL='https://tridentcx.github.io/relay-extension/pricing/';
 
 function applyPlan(plan){
   const isPro = plan==='pro';

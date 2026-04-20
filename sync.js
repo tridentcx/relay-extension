@@ -23,7 +23,7 @@ async function getConfig() {
   if (_remoteConfig) return _remoteConfig;
   try {
     const res = await fetch(
-      'https://shahakshat14.github.io/relay-extension/config.json',
+      'https://tridentcx.github.io/relay-extension/config.json',
       { cache: 'no-cache' }
     );
     if (res.ok) {
