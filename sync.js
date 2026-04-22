@@ -346,6 +346,21 @@ async function checkRateLimit(vaultId) {
   if (data?.allowed === false) throw new Error(`RATE_LIMIT:${data.window || data.reason || 'minute'}`);
 }
 
+async function shouldApplyRemote(remoteUpdatedAt) {
+  if (!remoteUpdatedAt) return false;
+  try {
+    const { lastSync } = await chrome.storage.local.get('lastSync');
+    if (!lastSync) return true;
+    const remoteTs = new Date(remoteUpdatedAt).getTime();
+    const lastTs   = new Date(lastSync).getTime();
+    if (!Number.isFinite(remoteTs) || !Number.isFinite(lastTs)) return true;
+    // Small tolerance for timestamp jitter across systems.
+    return remoteTs > (lastTs + 1000);
+  } catch {
+    return true;
+  }
+}
+
 // ─── Save a snapshot to sync_history (Pro only) ─────────────────────
 async function saveSnapshot(vaultId, encryptedBlob, count) {
   if (!window._relayCrypto.isValidVaultKey(vaultId)) return;
@@ -404,8 +419,13 @@ async function doSync(username, password, accountSalt) {
     if (!await getWriteToken()) {
       await claimLegacyVault(vaultId, remote.data);
     }
-    // applyRemote may throw structured errors — let them propagate
-    pulled = await applyRemote(data);
+    // Pull only when cloud is newer than this browser's last successful sync.
+    // This prevents deleted local bookmarks from being immediately re-added by
+    // replaying an older/equal remote snapshot.
+    if (await shouldApplyRemote(remote.updated_at)) {
+      // applyRemote may throw structured errors — let them propagate
+      pulled = await applyRemote(data);
+    }
   }
 
   await ensureWriteToken();
