@@ -566,13 +566,17 @@ q('btnSignIn').addEventListener('click',async()=>{
       throw new Error('Wrong password. Please try again.');
     }
 
-    // Credentials verified. Clear local storage while preserving device-bound
-    // vault proof so returning browsers can keep syncing after RLS hardening.
-    const {browserId,accountSalt:existingSalt,writeToken}=await chrome.storage.local.get(['browserId','accountSalt','writeToken']);
+    // Credentials verified. Clear local storage, then restore only values that
+    // are definitely valid for the vault we just authenticated.
+    // NOTE: Keeping an old accountSalt while signing into a legacy vault
+    // (or different account) causes sync to derive the wrong vault key.
+    const { browserId, accountSalt: existingSalt } = await chrome.storage.local.get(['browserId','accountSalt']);
+    const signedInWithLocalSalt = !!(localSalt && usedVk === saltedVk);
     await chrome.storage.local.clear();
-    if(browserId)     await chrome.storage.local.set({browserId});
-    if(existingSalt)  await chrome.storage.local.set({accountSalt:existingSalt});
-    if(writeToken)    await chrome.storage.local.set({writeToken});
+    if (browserId) await chrome.storage.local.set({ browserId });
+    if (signedInWithLocalSalt && existingSalt) {
+      await chrome.storage.local.set({ accountSalt: existingSalt });
+    }
 
     await saveSession(username, password);
     await chrome.storage.local.set({hasAccount:true, username});
