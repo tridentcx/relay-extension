@@ -23,6 +23,7 @@ test('manifest keeps the permission surface narrow', () => {
   assert.match(manifest.content_security_policy.extension_pages, /script-src 'self'/);
   assert.match(manifest.content_security_policy.extension_pages, /https:\/\/relayextension\.com/);
   assert.match(manifest.content_security_policy.extension_pages, /https:\/\/api\.github\.com/);
+  assert.doesNotMatch(manifest.content_security_policy.extension_pages, /github\.io/);
   assert.doesNotMatch(manifest.content_security_policy.extension_pages, /unsafe-inline|unsafe-eval/);
 });
 
@@ -68,6 +69,14 @@ test('package script excludes non-extension pages', () => {
   assert.doesNotMatch(script, /privacy\.html/);
 });
 
+test('release tooling supports checksums and live sync contract tests', () => {
+  const pkg = JSON.parse(read('package.json'));
+  assert.equal(pkg.scripts.checksums, 'bash scripts/create-checksums.sh');
+  assert.equal(pkg.scripts['test:rpc'], 'node tests/sync-rpc-contract.test.js');
+  assert.equal(fs.existsSync(path.join(root, 'scripts/create-checksums.sh')), true);
+  assert.equal(fs.existsSync(path.join(root, 'tests/sync-rpc-contract.test.js')), true);
+});
+
 test('public docs expose direct download and install instructions', () => {
   const readme = read('README.md');
   const install = read('docs/INSTALL.md');
@@ -99,7 +108,7 @@ test('repository has GitHub navigation and intake templates', () => {
   assert.match(read('.github/PULL_REQUEST_TEMPLATE.md'), /Version bumped/);
 });
 
-test('store submission assets are generated and documented', () => {
+test('store submission assets avoid synthetic screenshots', () => {
   const pkg = JSON.parse(read('package.json'));
   const listing = read('docs/GOOGLE_STORE_SUBMISSION.md');
   const assets = [
@@ -107,19 +116,9 @@ test('store submission assets are generated and documented', () => {
     'icons/icon48.png',
     'icons/icon128.png',
     'store-assets/relay-logo.svg',
-    'store-assets/screenshots/01-sync-command-center.png',
-    'store-assets/screenshots/02-private-sign-in.png',
-    'store-assets/screenshots/03-pro-history.png',
-    'store-assets/screenshots/04-settings-updates.png',
-    'store-assets/screenshots/05-trust-model.png',
     'store-assets/promotional/small-promo-440x280.png',
     'store-assets/promotional/marquee-promo-1400x560.png',
     'store-assets/google-submission/store-icon-128.png',
-    'store-assets/google-submission/screenshot-01-sync.png',
-    'store-assets/google-submission/screenshot-02-sign-in.png',
-    'store-assets/google-submission/screenshot-03-history.png',
-    'store-assets/google-submission/screenshot-04-settings.png',
-    'store-assets/google-submission/screenshot-05-privacy.png',
     'store-assets/google-submission/promo-small-440x280.png',
     'store-assets/google-submission/promo-marquee-1400x560.png',
   ];
@@ -128,6 +127,10 @@ test('store submission assets are generated and documented', () => {
     assert.equal(fs.existsSync(path.join(root, asset)), true, `${asset} is missing`);
     assert.match(listing, new RegExp(asset.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   }
+  assert.doesNotMatch(listing, /store-assets\/google-submission\/screenshot-/);
+  assert.match(listing, /Capture real installed-extension screenshots manually/);
+  assert.equal(fs.existsSync(path.join(root, 'store-assets/screenshots')), false);
+  assert.doesNotMatch(read('scripts/generate-store-assets.js'), /function screenshot[A-Z]/);
 });
 
 test('branch workflow is documented and checked in CI', () => {
@@ -154,11 +157,12 @@ test('public repo excludes private operations materials', () => {
 });
 
 test('public urls use relayextension domain', () => {
-  const publicFiles = read('README.md') + read('popup.js') + read('popup.html') + read('sync.js') + read('privacy.html') + read('pricing/index.html') + read('pricing/success.html');
+  const publicFiles = read('README.md') + read('popup.js') + read('popup.html') + read('sync.js') + read('privacy.html') + read('pricing/index.html') + read('pricing/success.html') + read('manifest.json');
   const restrictedMenuLabel = new RegExp(`>${String.fromCharCode(79, 112, 101, 110)} ${String.fromCharCode(83, 111, 117, 114, 99, 101)}<`);
   const previousOwner = String.fromCharCode(116, 114, 105, 100, 101, 110, 116, 99, 120);
   assert.match(publicFiles, /https:\/\/relayextension\.com/);
   assert.doesNotMatch(publicFiles, new RegExp(`${previousOwner}\\.github\\.io\\/relay-extension|${previousOwner}\\/relay-extension`));
+  assert.doesNotMatch(publicFiles, /trident-cx\.github\.io/);
   assert.doesNotMatch(publicFiles, restrictedMenuLabel);
 });
 

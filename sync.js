@@ -24,7 +24,6 @@ async function getConfig() {
   try {
     for (const url of [
       'https://relayextension.com/config.json',
-      'https://trident-cx.github.io/relay-extension/config.json',
     ]) {
       const res = await fetch(url, { cache: 'no-cache' });
       if (res.ok) {

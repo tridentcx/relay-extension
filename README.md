@@ -27,7 +27,7 @@ This repository is intentionally small and user-facing. It includes:
 
 - The browser extension source
 - The public website files
-- Google submission-ready icons, screenshots, and promotional assets
+- Google submission-ready icons and privacy-first promotional assets
 - Installation, privacy, support, and release notes
 
 ## Product status
@@ -104,7 +104,7 @@ relay-extension/
 ├── config.json         — Remote feature flags served via GitHub Pages
 ├── docs/               — Install, privacy, security, support, release notes
 ├── icons/              — icon16.png, icon48.png, icon128.png
-├── store-assets/       — Google submission screenshots and promotional images
+├── store-assets/       — Google submission icon and promotional images
 └── pricing/            — public pricing and success pages
 ```
 
@@ -164,12 +164,18 @@ Regenerate icons and Google submission artwork:
 npm run assets:store
 ```
 
-This uses local Chrome or Chromium to render PNG screenshots. Set `CHROME_BIN` if your browser executable is in a custom location. Final upload-ready PNGs are copied into `store-assets/google-submission/`.
+This uses local Chrome or Chromium to render PNG artwork. Set `CHROME_BIN` if your browser executable is in a custom location. Final upload-ready PNGs are copied into `store-assets/google-submission/`.
 
 Package a store-ready zip:
 
 ```bash
 npm run package
+```
+
+Create a checksum file for the package:
+
+```bash
+npm run checksums -- /path/to/relay-extension-stable-v<version>.zip
 ```
 
 Every update must bump `manifest.json` and `package.json` together. Use:

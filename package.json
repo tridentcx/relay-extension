@@ -1,6 +1,6 @@
 {
   "name": "relay-extension",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Simple private bookmark sync browser extension.",
   "license": "SEE LICENSE IN LICENSE",
@@ -9,7 +9,9 @@
     "test": "node tests/static-contracts.test.js",
     "bump:version": "node scripts/bump-version.js",
     "assets:store": "node scripts/generate-store-assets.js",
-    "package": "bash scripts/package-extension.sh"
+    "package": "bash scripts/package-extension.sh",
+    "checksums": "bash scripts/create-checksums.sh",
+    "test:rpc": "node tests/sync-rpc-contract.test.js"
   },
   "engines": {
     "node": ">=20"

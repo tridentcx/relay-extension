@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Relay – Private Bookmark Sync",
   "short_name": "Relay",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Private bookmark sync for Chrome and Edge. Simple, encrypted, no email, no tracking.",
   "permissions": [
     "bookmarks",
@@ -26,6 +26,6 @@
     "128": "icons/icon128.png"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://*.supabase.co https://relayextension.com https://trident-cx.github.io https://api.github.com"
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://*.supabase.co https://relayextension.com https://api.github.com"
   }
 }

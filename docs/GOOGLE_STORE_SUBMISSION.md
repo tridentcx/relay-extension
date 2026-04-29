@@ -102,9 +102,10 @@ npm run bump:version -- patch
 npm run assets:store
 npm run check
 npm run package
+npm run checksums -- /path/to/relay-extension-stable-v<version>.zip
 ```
 
-Upload the generated `relay-extension-stable-v<version>.zip` file from the repository root. GitHub Releases publish versioned stable builds only; there is no `latest` zip.
+Upload the generated `relay-extension-stable-v<version>.zip` file from the repository root. GitHub Releases publish versioned stable builds and `SHA256SUMS.txt`; there is no `latest` zip.
 
 ## Manual QA
 
@@ -122,40 +123,40 @@ Upload the generated `relay-extension-stable-v<version>.zip` file from the repos
 Upload these PNG files from `store-assets/google-submission/`:
 
 - `store-assets/google-submission/store-icon-128.png`
-- `store-assets/google-submission/screenshot-01-sync.png`
-- `store-assets/google-submission/screenshot-02-sign-in.png`
-- `store-assets/google-submission/screenshot-03-history.png`
-- `store-assets/google-submission/screenshot-04-settings.png`
-- `store-assets/google-submission/screenshot-05-privacy.png`
 - `store-assets/google-submission/promo-small-440x280.png`
 - `store-assets/google-submission/promo-marquee-1400x560.png`
 
-Source artwork is also kept here:
+Google also requires real screenshots in the Chrome Web Store dashboard. Do not use generated mockups for those. Capture screenshots from the installed extension after loading the exact submission build, using clean sample data only and no private bookmarks.
+
+Recommended screenshot set:
+
+- Sign-in/setup screen showing the no-email flow
+- Main sync screen after a successful sync with sample bookmarks only
+- Settings screen showing privacy/update controls
+- Pro restore/history screen if submitting Pro claims
+- Account deletion/privacy controls
+
+Source artwork kept in this repository:
 
 - `icons/icon16.png`
 - `icons/icon48.png`
 - `icons/icon128.png`
 - `store-assets/relay-logo.svg`
-- `store-assets/screenshots/01-sync-command-center.png`
-- `store-assets/screenshots/02-private-sign-in.png`
-- `store-assets/screenshots/03-pro-history.png`
-- `store-assets/screenshots/04-settings-updates.png`
-- `store-assets/screenshots/05-trust-model.png`
 - `store-assets/promotional/small-promo-440x280.png`
 - `store-assets/promotional/marquee-promo-1400x560.png`
 
-Regenerate all visual assets with `npm run assets:store` before a store submission. The generator uses local Chrome or Chromium for PNG rendering; set `CHROME_BIN` if needed. Screenshots should use clean sample data only and avoid showing private bookmark data.
+Regenerate icons and promotional assets with `npm run assets:store` before a store submission. The generator uses local Chrome or Chromium for PNG rendering; set `CHROME_BIN` if needed.
 
 ## Google dashboard upload map
 
 | Dashboard field | Upload |
 |---|---|
 | Store icon | `store-icon-128.png` |
-| Screenshots | `screenshot-01-sync.png` through `screenshot-05-privacy.png` |
+| Screenshots | Capture real installed-extension screenshots manually |
 | Small promo tile | `promo-small-440x280.png` |
 | Marquee promo tile | `promo-marquee-1400x560.png` |
 
-The current image set follows Google's published dimensions: one 128x128 icon, five 1280x800 screenshots, one 440x280 small promo tile, and one 1400x560 marquee tile.
+The generated image set includes one 128x128 icon, one 440x280 small promo tile, and one 1400x560 marquee tile. Screenshots should be real product captures from the submitted build.
 
 ## Rejection watchlist
 
