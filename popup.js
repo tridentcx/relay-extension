@@ -182,8 +182,13 @@ async function myVaultKey() {
 const q=id=>document.getElementById(id);
 
 function show(id){
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  q(id)?.classList.add('active');
+  const next = q(id);
+  if(!next)return;
+  const activeViews = document.querySelectorAll('.view.active');
+  if(next.classList.contains('active') && activeViews.length===1)return;
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active','view-enter'));
+  next.classList.add('active');
+  requestAnimationFrame(()=>next.classList.add('view-enter'));
 }
 
 function eye(inpId, btnId){

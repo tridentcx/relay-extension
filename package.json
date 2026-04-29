@@ -1,6 +1,6 @@
 {
   "name": "relay-extension",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "private": true,
   "description": "Simple private bookmark sync browser extension.",
   "license": "SEE LICENSE IN LICENSE",

@@ -4,6 +4,10 @@ This public changelog tracks user-facing release changes. Internal deployment, b
 
 ## Unreleased
 
+## v1.0.8 — 2026-04-29
+- Declared popup dimensions in the first bytes of the document to prevent Edge's tiny pre-size flash
+- Removed the first-open view animation and kept smoother transitions for later in-popup navigation
+
 ## v1.0.7 — 2026-04-29
 - Improved popup first paint by loading the full UI controller after the browser paints the interface
 - Kept the direct Edge-safe popup path while reducing startup work before the popup becomes visible
