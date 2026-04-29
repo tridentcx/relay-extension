@@ -31,4 +31,4 @@ Do not include:
 
 ## Security issues
 
-For suspected vulnerabilities, open an issue with a minimal reproduction. If public disclosure would create risk, contact the repository owner through GitHub first and request a private reporting path.
+For suspected vulnerabilities, open an issue with a minimal reproduction that does not include secrets, private vault data, or exploit instructions. If public disclosure would create risk, request a private reporting path through the repository contact flow first.

@@ -1,10 +1,10 @@
 # Privacy Policy - Relay
 
-*Last updated: April 28, 2026*
+*Last updated: April 29, 2026*
 
 ## The Short Version
 
-Relay does not ask for your name or email, does not use analytics SDKs, and cannot read your bookmarks. Your bookmark vault is encrypted on your device before sync.
+Relay does not ask for your name or email, does not use analytics SDKs, and is designed so bookmark contents are encrypted before sync. The service stores an encrypted vault, not a readable bookmark profile.
 
 ## What We Collect
 
@@ -13,7 +13,7 @@ Relay stores the minimum data needed to operate private bookmark sync:
 - **Encrypted vault:** your bookmark data after it has been encrypted on your device.
 - **Vault lookup key:** a derived identifier used to find your vault without storing your username in plain text.
 - **Browser UUID:** a random install identifier used for browser limits and abuse prevention.
-- **Short-lived sync metadata:** minimal technical metadata used for rate limits and reliability.
+- **Short-lived sync metadata:** minimal technical metadata used for rate limits, abuse prevention, and reliability.
 
 ## What We Do Not Collect
 
@@ -21,7 +21,7 @@ Relay does not collect, store, or transmit:
 
 - Your name
 - Your email address
-- Your password
+- Your password in plaintext
 - Your browsing history
 - Your location data
 - Analytics events or tracking identifiers
@@ -33,15 +33,17 @@ Relay does not collect, store, or transmit:
 
 **Stripe** handles Relay Pro payments. Relay does not receive card details.
 
+**Cloudflare/GitHub hosting** may process standard request metadata when you visit Relay web pages or download a release.
+
 Relay does not include advertising networks, tracking pixels, analytics SDKs, or remote scripts.
 
 ## Data Retention
 
-Your encrypted vault is retained until you delete your account. Pro sync history is retained for a limited restore window, then expires. Account deletion removes the server-side vault and related sync records.
+Your encrypted vault is retained until you delete your account. Pro sync history is retained for a limited restore window, then expires. Account deletion removes the server-side vault and related sync records. Payment records are handled by Stripe according to Stripe's retention requirements.
 
 ## Cookies and Tracking
 
-Relay does not use website analytics, tracking pixels, advertising scripts, or extension telemetry. The extension does not inject content into web pages.
+Relay does not use website analytics, tracking pixels, advertising scripts, or extension telemetry. The extension does not inject content into web pages. Website hosts and CDNs may keep standard security and delivery logs.
 
 ## Source Visibility
 

@@ -161,4 +161,4 @@ The current image set follows Google's published dimensions: one 128x128 icon, f
 
 - Do not add `tabs`, host permissions, content scripts, or broad URL permissions unless absolutely necessary
 - Keep the CSP free of `unsafe-inline`, `unsafe-eval`, and remote script sources
-- Keep privacy claims aligned with [privacy.md](privacy.md), [privacy.html](privacy.html), and [SECURITY.md](SECURITY.md)
+- Keep privacy claims aligned with [PRIVACY.md](PRIVACY.md), [privacy.html](../privacy.html), and [SECURITY.md](SECURITY.md)

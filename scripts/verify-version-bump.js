@@ -45,6 +45,10 @@ function readJsonAt(ref, file) {
   return JSON.parse(git(['show', `${ref}:${file}`]));
 }
 
+function readTextAt(ref, file) {
+  return git(['show', `${ref}:${file}`]);
+}
+
 const manifest = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
 const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 assert.equal(pkg.version, manifest.version, 'package.json and manifest.json versions must match');
@@ -76,6 +80,35 @@ if (files.length === 0) {
 const oldManifest = readJsonAt(base, 'manifest.json');
 const oldPkg = readJsonAt(base, 'package.json');
 assert.equal(oldPkg.version, oldManifest.version, `Base ${base} has mismatched versions`);
+
+const repoOnlyPatterns = [
+  /^README\.md$/,
+  /^LICENSE$/,
+  /^privacy\.html$/,
+  /^\.env\.example$/,
+  /^docs\//,
+  /^\.github\/(ISSUE_TEMPLATE\/|PULL_REQUEST_TEMPLATE\.md$)/,
+  /^tests\/static-contracts\.test\.js$/,
+  /^scripts\/verify-version-bump\.js$/,
+  /^\.gitignore$/,
+];
+function isRepoOnlyChange(file) {
+  if (repoOnlyPatterns.some((pattern) => pattern.test(file))) return true;
+  if (file === 'popup.js') {
+    const normalizeGuideUrl = (text) => text.replace(
+      /const INSTALL_GUIDE_URL='[^']+';/,
+      "const INSTALL_GUIDE_URL='INSTALL_GUIDE_URL';"
+    );
+    return normalizeGuideUrl(readTextAt(base, file)).trim() === normalizeGuideUrl(fs.readFileSync(file, 'utf8')).trim();
+  }
+  return false;
+}
+
+const requiresExtensionVersion = files.some((file) => !isRepoOnlyChange(file));
+if (!requiresExtensionVersion) {
+  console.log('PASS no extension version bump needed for docs/repository-only changes');
+  process.exit(0);
+}
 
 assert(
   compareVersions(pkg.version, oldPkg.version) > 0,

@@ -1,8 +1,8 @@
 # Terms of Service
 
-Last updated: April 27, 2026
+Last updated: April 29, 2026
 
-These terms are a practical operating baseline for Relay. They are not a substitute for legal advice, but they make the product expectations clear for users, contributors, and operators.
+These terms are a practical operating baseline for Relay. They are not a substitute for legal advice, but they make the product expectations clear for users and approved collaborators.
 
 ## Service
 
@@ -32,7 +32,7 @@ Do not use Relay to:
 
 ## Privacy and security
 
-Relay is designed so bookmark contents are encrypted before upload. Relay cannot read bookmark contents without the user's password. See [privacy.md](privacy.md) and [SECURITY.md](SECURITY.md).
+Relay is designed so bookmark contents are encrypted before upload. Relay cannot read bookmark contents without the user's password. See [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md).
 
 No system is perfect. Users should keep independent browser or system backups for important bookmark data.
 
@@ -42,7 +42,7 @@ Relay may be unavailable during maintenance, provider outages, abuse mitigation,
 
 ## Intellectual property
 
-Relay, its source code, branding, icons, and related materials are proprietary. Repository visibility does not grant permission to use, copy, modify, redistribute, host, or commercialize the product except as allowed in [LICENSE](LICENSE).
+Relay, its source code, branding, icons, and related materials are proprietary. Repository visibility does not grant permission to use, copy, modify, redistribute, host, or commercialize the product except as allowed in [LICENSE](../LICENSE).
 
 ## Changes
 

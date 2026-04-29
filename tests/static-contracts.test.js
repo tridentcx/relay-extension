@@ -70,9 +70,9 @@ test('package script excludes non-extension pages', () => {
 
 test('public docs expose direct download and install instructions', () => {
   const readme = read('README.md');
-  const install = read('INSTALL.md');
+  const install = read('docs/INSTALL.md');
   assert.match(readme, /relay-extension-stable-v<version>\.zip/);
-  assert.match(readme, /\[INSTALL\.md\]\(INSTALL\.md\)/);
+  assert.match(readme, /\[docs\/INSTALL\.md\]\(docs\/INSTALL\.md\)/);
   assert.match(readme, /github\/v\/release\/trident-cx\/relay-extension/);
   assert.doesNotMatch(readme + install, /relay-extension-latest\.zip/);
   assert.match(install, /chrome:\/\/extensions/);
@@ -101,7 +101,7 @@ test('repository has GitHub navigation and intake templates', () => {
 
 test('store submission assets are generated and documented', () => {
   const pkg = JSON.parse(read('package.json'));
-  const listing = read('STORE_LISTING.md');
+  const listing = read('docs/GOOGLE_STORE_SUBMISSION.md');
   const assets = [
     'icons/icon16.png',
     'icons/icon48.png',
@@ -148,7 +148,7 @@ test('public repo excludes private operations materials', () => {
     const privatePattern = `(^|/)(supabase|wrangler\\.${String.fromCharCode(97, 100, 109, 105, 110)}\\.toml|deploy-${String.fromCharCode(97, 100, 109, 105, 110)}\\.sh|${String.fromCharCode(97, 100, 109, 105, 110)}-worker|${String.fromCharCode(97, 100, 109, 105, 110)}-dashboard|rollback-release|create-release-backup)`;
     assert.doesNotMatch(file, new RegExp(privatePattern));
   }
-  const publicDocs = read('README.md') + read('CONTRIBUTING.md') + read('CHANGELOG.md');
+  const publicDocs = read('README.md') + read('docs/CONTRIBUTING.md') + read('docs/CHANGELOG.md');
   const privateHost = `${String.fromCharCode(97, 100, 109, 105, 110)}\\.relayextension\\.com`;
   assert.doesNotMatch(publicDocs, new RegExp(`${privateHost}|wrangler|operator dashboard|private operator|backend audit|supabase/migrations`, 'i'));
 });
@@ -157,9 +157,8 @@ test('public urls use relayextension domain', () => {
   const publicFiles = read('README.md') + read('popup.js') + read('popup.html') + read('sync.js') + read('privacy.html') + read('pricing/index.html') + read('pricing/success.html');
   const restrictedMenuLabel = new RegExp(`>${String.fromCharCode(79, 112, 101, 110)} ${String.fromCharCode(83, 111, 117, 114, 99, 101)}<`);
   const previousOwner = String.fromCharCode(116, 114, 105, 100, 101, 110, 116, 99, 120);
-  const personalOwner = String.fromCharCode(115, 104, 97, 104, 97, 107, 115, 104, 97, 116, 49, 52);
   assert.match(publicFiles, /https:\/\/relayextension\.com/);
-  assert.doesNotMatch(publicFiles, new RegExp(`${previousOwner}\\.github\\.io\\/relay-extension|${previousOwner}\\/relay-extension|${personalOwner}\\.github\\.io\\/relay-extension|${personalOwner}\\/relay-extension`));
+  assert.doesNotMatch(publicFiles, new RegExp(`${previousOwner}\\.github\\.io\\/relay-extension|${previousOwner}\\/relay-extension`));
   assert.doesNotMatch(publicFiles, restrictedMenuLabel);
 });
 

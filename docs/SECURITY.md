@@ -1,6 +1,6 @@
 # Security Model — Relay
 
-Relay was built privacy-first. This document describes the actual implementation — no marketing, no vague claims.
+Relay was built privacy-first. This document describes the implementation at a high level without exposing private operational details.
 
 ---
 
@@ -121,4 +121,4 @@ No inline scripts. No eval. No external script sources.
 
 ## Reporting a vulnerability
 
-Open a GitHub issue at [github.com/trident-cx/relay-extension/issues](https://github.com/trident-cx/relay-extension/issues). If you need a non-public disclosure path, contact the repository owner first through GitHub and request a private reporting channel. We aim to respond within 48 hours.
+Open a GitHub issue at [github.com/trident-cx/relay-extension/issues](https://github.com/trident-cx/relay-extension/issues) with a minimal, non-sensitive reproduction. Do not post secrets, private vault data, or step-by-step abuse instructions. If public disclosure would create risk, request a private reporting path through the repository contact flow first. We aim to respond within 48 hours.

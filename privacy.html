@@ -111,13 +111,13 @@
   <div class="eyebrow">Privacy Policy</div>
   <h1>Built to know as little as possible.</h1>
   <p>Relay syncs bookmarks by storing an encrypted vault, not a profile about you. Useful, calm, and intentionally low-noise.</p>
-  <div class="updated">Last updated: April 28, 2026</div>
+  <div class="updated">Last updated: April 29, 2026</div>
 </header>
 
 <main class="wrap container">
   <div class="tldr">
     <div class="tldr-label">The short version</div>
-    <p>Relay does not ask for your name or email, does not use analytics SDKs, and cannot read your bookmarks. Your bookmark vault is encrypted on your device before sync.</p>
+    <p>Relay does not ask for your name or email, does not use analytics SDKs, and is designed so bookmark contents are encrypted before sync. The service stores an encrypted vault, not a readable bookmark profile.</p>
   </div>
 
   <h2>What we collect</h2>
@@ -145,14 +145,14 @@
       </tr>
       <tr>
         <td><strong>Short-lived sync metadata</strong></td>
-        <td>Minimal technical metadata used for rate limits and reliability.</td>
+        <td>Minimal technical metadata used for rate limits, abuse prevention, and reliability.</td>
         <td class="yes">Limited</td>
       </tr>
     </tbody>
   </table>
 
   <h2>What we do not collect</h2>
-  <p>Relay does not collect, store, or transmit your name, email address, password, browsing history, location data, analytics events, tracking identifiers, or readable bookmark contents.</p>
+  <p>Relay does not collect, store, or transmit your name, email address, plaintext password, browsing history, location data, analytics events, tracking identifiers, or readable bookmark contents.</p>
 
   <h2>How encryption works</h2>
   <p>Your bookmarks are encrypted on your device before they leave the browser.</p>
@@ -168,10 +168,11 @@
   <h2>Third-party services</h2>
   <p><strong>Supabase</strong> stores encrypted vault data and operational metadata for sync.</p>
   <p><strong>Stripe</strong> handles Relay Pro payments. Relay does not receive card details.</p>
+  <p><strong>Cloudflare/GitHub hosting</strong> may process standard request metadata when you visit Relay web pages or download a release.</p>
   <p>Relay does not include advertising networks, tracking pixels, analytics SDKs, or remote scripts.</p>
 
   <h2>Data retention</h2>
-  <p>Your encrypted vault is retained until you delete your account. Pro sync history is retained for a limited restore window, then expires. Account deletion removes the server-side vault and related sync records.</p>
+  <p>Your encrypted vault is retained until you delete your account. Pro sync history is retained for a limited restore window, then expires. Account deletion removes the server-side vault and related sync records. Payment records are handled by Stripe according to Stripe's retention requirements.</p>
 
   <h2>Your rights</h2>
   <p>You can delete your account at any time from Relay settings. Because Relay does not require email or name collection, support requests may require you to provide non-sensitive context such as your Relay version and visible error message.</p>

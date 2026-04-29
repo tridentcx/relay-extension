@@ -6,7 +6,7 @@
 
 - [ ] `npm run check`
 - [ ] `npm run package`
-- [ ] Version bumped in `manifest.json` and `package.json`
+- [ ] Version bumped in `manifest.json` and `package.json`, unless this is docs/repository hygiene only
 - [ ] Documentation updated, if user-facing behavior changed
 
 ## Safety notes

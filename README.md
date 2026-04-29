@@ -6,7 +6,7 @@
 
   <a href="https://relayextension.com">Website</a> ·
   <a href="https://github.com/trident-cx/relay-extension/releases">Downloads</a> ·
-  <a href="INSTALL.md">Install Guide</a> ·
+  <a href="docs/INSTALL.md">Install Guide</a> ·
   <a href="https://github.com/trident-cx/relay-extension/releases/latest">Latest Release</a> ·
   <a href="https://relayextension.com/privacy">Privacy Policy</a> ·
   <a href="https://github.com/trident-cx/relay-extension/issues">Support</a>
@@ -23,12 +23,12 @@ Relay keeps bookmarks in sync across browsers using only a username and password
 
 It is designed to feel quiet: open Relay, sync, and get back to what you were doing.
 
-This repository includes:
+This repository is intentionally small and user-facing. It includes:
 
 - The browser extension source
 - The public website files
 - Google submission-ready icons, screenshots, and promotional assets
-- User-facing installation, privacy, support, and release notes
+- Installation, privacy, support, and release notes
 
 ## Product status
 
@@ -55,17 +55,17 @@ Download the current stable build from GitHub Releases:
 
 [Relay Releases](https://github.com/trident-cx/relay-extension/releases)
 
-Choose the asset named `relay-extension-stable-v<version>.zip`, then follow [INSTALL.md](INSTALL.md) to load the extension in Chrome or Edge.
+Choose the asset named `relay-extension-stable-v<version>.zip`, then follow [docs/INSTALL.md](docs/INSTALL.md) to load the extension in Chrome or Edge.
 
 ## Quick navigation
 
 | I want to... | Go here |
 |---|---|
-| Install Relay | [INSTALL.md](INSTALL.md) |
+| Install Relay | [docs/INSTALL.md](docs/INSTALL.md) |
 | Download a stable build | [Versioned releases](https://github.com/trident-cx/relay-extension/releases) |
-| See what changed | [CHANGELOG.md](CHANGELOG.md) |
+| See what changed | [docs/CHANGELOG.md](docs/CHANGELOG.md) |
 | Report a problem | [GitHub Issues](https://github.com/trident-cx/relay-extension/issues/new/choose) |
-| Review security posture | [SECURITY.md](SECURITY.md) |
+| Review security posture | [docs/SECURITY.md](docs/SECURITY.md) |
 
 ## Updates
 
@@ -80,13 +80,15 @@ Relay separates vault lookup from vault contents:
 
 What lives on the server: only the vault key hash and an unreadable encrypted blob.
 
-See [SECURITY.md](SECURITY.md) for the full threat model and implementation details.
+See [docs/SECURITY.md](docs/SECURITY.md) for the full threat model and implementation details.
 
 ## Docs
 
-- [INSTALL.md](INSTALL.md): install and update Relay
-- [SECURITY.md](SECURITY.md): privacy and security model
-- [CHANGELOG.md](CHANGELOG.md): release history
+- [docs/INSTALL.md](docs/INSTALL.md): install and update Relay
+- [docs/SECURITY.md](docs/SECURITY.md): privacy and security model
+- [docs/PRIVACY.md](docs/PRIVACY.md): readable privacy policy
+- [docs/CHANGELOG.md](docs/CHANGELOG.md): release history
+- [docs/GOOGLE_STORE_SUBMISSION.md](docs/GOOGLE_STORE_SUBMISSION.md): Chrome Web Store checklist
 
 ## File structure
 
@@ -100,7 +102,7 @@ relay-extension/
 ├── popup.html          — All views + design system CSS
 ├── popup.js            — UI logic: all event handlers, view state
 ├── config.json         — Remote feature flags served via GitHub Pages
-├── CONTRIBUTING.md     — Repository workflow and contribution policy
+├── docs/               — Install, privacy, security, support, release notes
 ├── icons/              — icon16.png, icon48.png, icon128.png
 ├── store-assets/       — Google submission screenshots and promotional images
 └── pricing/            — public pricing and success pages

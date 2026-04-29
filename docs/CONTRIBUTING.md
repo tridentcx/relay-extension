@@ -4,7 +4,7 @@ Relay is a proprietary product. Contributions are accepted only with the reposit
 
 ## Before you start
 
-- Review [LICENSE](LICENSE) to understand the repository terms
+- Review [LICENSE](../LICENSE) to understand the repository terms
 - Open an issue before starting substantial work unless you already have direct approval
 - Keep changes focused; avoid mixing bug fixes, UI changes, and operational edits in one branch
 - Update documentation when behavior, setup, pricing, privacy, security, or licensing expectations change
@@ -37,9 +37,9 @@ Manual verification should cover:
 
 Update the relevant docs when you change:
 
-- Product behavior: [README.md](README.md), [CHANGELOG.md](CHANGELOG.md)
+- Product behavior: [README.md](../README.md), [CHANGELOG.md](CHANGELOG.md)
 - Security-sensitive behavior: [SECURITY.md](SECURITY.md)
-- Data collection or retention statements: [privacy.md](privacy.md), [privacy.html](privacy.html)
+- Data collection or retention statements: [PRIVACY.md](PRIVACY.md), [privacy.html](../privacy.html)
 
 ## Pull requests
 

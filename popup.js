@@ -191,7 +191,7 @@ function age(iso){
 const PRICING_URL='https://relayextension.com/pricing/';
 const RELEASE_API_URL='https://api.github.com/repos/trident-cx/relay-extension/releases/latest';
 const RELEASES_URL='https://github.com/trident-cx/relay-extension/releases';
-const INSTALL_GUIDE_URL='https://github.com/trident-cx/relay-extension/blob/main/INSTALL.md';
+const INSTALL_GUIDE_URL='https://github.com/trident-cx/relay-extension/blob/main/docs/INSTALL.md';
 const UPDATE_CACHE_MAX_MS=24*60*60*1000;
 let updateDownloadUrl=RELEASES_URL;
 
