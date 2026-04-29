@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Relay – Private Bookmark Sync",
   "short_name": "Relay",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Private bookmark sync for Chrome and Edge. Simple, encrypted, no email, no tracking.",
   "permissions": [
     "bookmarks",

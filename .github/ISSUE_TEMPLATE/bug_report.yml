@@ -12,7 +12,7 @@ body:
     attributes:
       label: Relay version
       description: Open Relay settings and copy the version shown at the bottom.
-      placeholder: "v1.0.4"
+      placeholder: "v1.0.5"
     validations:
       required: true
   - type: dropdown

@@ -4,6 +4,11 @@ This public changelog tracks user-facing release changes. Internal deployment, b
 
 ## Unreleased
 
+## v1.0.5 — 2026-04-29
+- Changed the popup shell handoff to a local page navigation for better Edge compatibility
+- Removed the local `fetch` and DOMParser bootstrap path that could hang in Edge extension popups
+- Kept the tiny shell first so the icon click still paints immediately
+
 ## v1.0.4 — 2026-04-29
 - Reworked the popup into a tiny instant shell plus a local app payload
 - Reduced the action popup's initial document from the full interface to a lightweight first-paint screen

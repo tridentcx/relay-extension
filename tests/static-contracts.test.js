@@ -101,10 +101,12 @@ test('popup exposes a safe GitHub release update checker', () => {
   assert.match(html, /popup-bootstrap\.js/);
   assert.doesNotMatch(html, /id="vSignIn"/);
   assert.match(app, /id="vSignIn" class="view active"/);
-  assert.doesNotMatch(app, /<script src=/);
+  assert.match(app, /<script src="popup\.js" defer><\/script>/);
   assert.match(bootstrap, /requestAnimationFrame/);
   assert.match(bootstrap, /popup-app\.html/);
-  assert.match(bootstrap, /popup\.js/);
+  assert.match(bootstrap, /window\.location\.replace/);
+  assert.doesNotMatch(bootstrap, /fetch\(/);
+  assert.doesNotMatch(bootstrap, /DOMParser/);
   assert.doesNotMatch(html, /<script src="config\.js"/);
   assert.doesNotMatch(html, /<script src="crypto\.js"/);
   assert.doesNotMatch(html, /<script src="sync\.js"/);
