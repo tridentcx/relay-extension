@@ -7,7 +7,7 @@ Use this before submitting Relay to the Chrome Web Store.
 - Name: `Relay - Private Bookmark Sync`
 - Short name: `Relay`
 - Category: Productivity
-- Primary value: private bookmark sync across browsers without email accounts, tracking, or a readable cloud vault
+- Primary value: keep bookmarks in sync across Chromium-based browsers without manual exports, email accounts, tracking, or a readable cloud vault
 - Website: `https://relayextension.com`
 - Support URL: `https://github.com/trident-cx/relay-extension/issues`
 - Privacy policy URL: `https://relayextension.com/privacy`
@@ -19,7 +19,7 @@ Use this before submitting Relay to the Chrome Web Store.
 ## Single purpose
 
 ```text
-Relay syncs browser bookmarks across Chrome and Edge using an encrypted vault that is created and decrypted on the user's device.
+Relay keeps browser bookmarks in sync across Chromium-based browsers with an encrypted vault created and decrypted on the user's device.
 ```
 
 ## Privacy answers
@@ -39,19 +39,19 @@ Relay syncs browser bookmarks across Chrome and Edge using an encrypted vault th
 Short description:
 
 ```text
-Private bookmark sync for Chrome and Edge. Simple, encrypted, no email, no tracking.
+Different browsers. Same bookmarks. Relay keeps Chromium-based browsers current with an encrypted vault only the user can unlock.
 ```
 
 Long description:
 
 ```text
-Relay keeps your bookmarks synced across browsers without turning them into a profile about you.
+Relay keeps bookmarks in sync across browsers without turning them into another profile about the user.
 
-Open Relay. Sync. Continue.
+Relay keeps Chrome, Edge, Brave, Arc, Opera, and other Chromium browsers current with an encrypted vault only the user can unlock.
 
-The interface is intentionally simple, with clear controls and no unnecessary account setup.
+The interface is intentionally compact: a private vault, a clear sync action, and settings that stay out of the way until bookmarks need updating.
 
-Use a username and password, sync manually on Free, or upgrade to Pro for unlimited browsers, unlimited bookmarks, auto-sync, and 30-day restore history.
+Use a username and password, sync manually on Free, or upgrade to Pro for unlimited Chromium browsers, unlimited bookmarks, auto-sync, and 30-day encrypted restore history.
 
 Privacy basics:
 - Bookmarks are encrypted on your device before upload
@@ -59,18 +59,18 @@ Privacy basics:
 - No analytics SDKs, ads, tracking pixels, or readable bookmark vault
 - Account deletion is available inside the extension
 
-Free includes 2 browsers, 500 bookmarks, and manual sync.
-Pro includes unlimited browsers, unlimited bookmarks, auto-sync, and restore history.
+Free includes 2 Chromium browsers, 500 bookmarks, and manual sync.
+Pro includes unlimited Chromium browsers, unlimited bookmarks, auto-sync, and 30-day restore history.
 ```
 
 ## Detailed description for Google review
 
 ```text
-Relay is a private bookmark sync extension for Chrome and Edge.
+Relay is an encrypted bookmark sync extension for people whose bookmarks drift across more than one browser.
 
-It lets users sign in with a username and password, encrypts bookmark data on the device, and syncs the encrypted vault through Relay's backend. Relay does not require email, does not include analytics SDKs, does not inject content scripts into pages, and does not collect browsing history.
+It lets users sign in with a username and password, encrypts bookmark data on the device, and syncs the encrypted vault through Relay's backend. This helps users avoid manually exporting, importing, recreating, deleting, and renaming bookmarks across browsers. Relay does not require email, does not include analytics SDKs, does not inject content scripts into pages, and does not collect browsing history.
 
-Free accounts support 2 browsers, 500 bookmarks, and manual sync. Relay Pro adds unlimited browsers, unlimited bookmarks, auto-sync, and 30-day restore history.
+Free accounts support 2 Chromium browsers, 500 bookmarks, and manual sync. Relay Pro adds unlimited Chromium browsers, unlimited bookmarks, auto-sync, and 30-day encrypted restore history.
 ```
 
 ## Permission explanations

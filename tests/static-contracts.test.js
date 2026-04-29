@@ -24,6 +24,8 @@ test('manifest keeps the permission surface narrow', () => {
   assert.match(manifest.content_security_policy.extension_pages, /script-src 'self'/);
   assert.match(manifest.content_security_policy.extension_pages, /https:\/\/relayextension\.com/);
   assert.match(manifest.content_security_policy.extension_pages, /https:\/\/api\.github\.com/);
+  assert.match(manifest.content_security_policy.extension_pages, /https:\/\/mgeiplftbehngfsqtbiq\.supabase\.co/);
+  assert.doesNotMatch(manifest.content_security_policy.extension_pages, /https:\/\/\*\.supabase\.co/);
   assert.doesNotMatch(manifest.content_security_policy.extension_pages, /github\.io/);
   assert.doesNotMatch(manifest.content_security_policy.extension_pages, /unsafe-inline|unsafe-eval/);
 });
@@ -113,12 +115,13 @@ test('popup exposes a safe GitHub release update checker', () => {
   assert.doesNotMatch(html, /<script src="popup\.js"/);
   assert.match(popup, /function ensureRelayModules\(\)/);
   assert.match(popup, /function warmRelayModules\(\)/);
+  assert.match(popup, /function openTrustedUrl\(/);
   assert.match(popup, /RELEASE_API_URL='https:\/\/api\.github\.com\/repos\/trident-cx\/relay-extension\/releases\/latest'/);
   assert.match(popup, /relay-extension-stable-v\$\{version\}\.zip/);
   assert.doesNotMatch(popup, /relay-extension-latest\.zip/);
   assert.match(popup, /function compareVersions/);
   assert.match(popup, /setTimeout\(\(\)=>checkForUpdates\(\{silent:true\}\)/);
-  assert.match(popup, /chrome\.tabs\.create\(\{url:updateDownloadUrl\}\)/);
+  assert.match(popup, /openTrustedUrl\(updateDownloadUrl, RELEASES_URL\)/);
   assert.match(html, /id="btnCheckUpdate"/);
   assert.match(html, /id="btnDownloadUpdate"/);
 });

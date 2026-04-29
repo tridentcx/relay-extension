@@ -109,12 +109,23 @@ body {
   min-width: 360px;
   height: 600px;
   min-height: 600px;
-  background: var(--bg);
+  background:
+    linear-gradient(155deg, rgba(255,253,248,0.94) 0%, rgba(247,244,238,0.98) 42%, rgba(236,229,216,0.92) 100%);
   color: var(--t-1);
   font-family: "Avenir Next", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   overflow-x: hidden;
   overflow-y: auto;
   position: relative; letter-spacing: 0;
+}
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(115deg, transparent 0 34%, rgba(12,110,110,0.045) 34% 34.5%, transparent 34.5% 100%),
+    linear-gradient(180deg, rgba(255,255,255,0.32), transparent 42%);
+  z-index: 0;
 }
 @media (prefers-color-scheme: dark) {
   body::before {
@@ -122,6 +133,15 @@ body {
     top: 0; left: 0; right: 0; height: 1px;
     background: linear-gradient(90deg, transparent, rgba(66,199,188,0.35), transparent);
     pointer-events: none; z-index: 0;
+  }
+  body {
+    background:
+      linear-gradient(155deg, rgba(21,20,17,0.98) 0%, rgba(29,27,23,0.98) 48%, rgba(17,31,29,0.92) 100%);
+  }
+  body::after {
+    background:
+      linear-gradient(115deg, transparent 0 34%, rgba(66,199,188,0.065) 34% 34.5%, transparent 34.5% 100%),
+      linear-gradient(180deg, rgba(255,255,255,0.035), transparent 42%);
   }
 }
 
@@ -312,6 +332,24 @@ body {
 .dot:nth-child(3) { animation-delay: .3s; }
 @keyframes dotBounce { 0%,60%,100% { opacity: .2; transform: scale(.6) translateY(0); } 30% { opacity: 1; transform: scale(1) translateY(-3px); } }
 
+.sync-proof {
+  display: none;
+  margin: -2px 0 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-card);
+  background: rgba(255,253,248,0.58);
+  color: var(--t-2);
+  font-size: 12.5px;
+  line-height: 1.45;
+  box-shadow: 0 1px 1px rgba(38,34,27,0.025);
+}
+.sync-proof.show { display: block; animation: tIn .18s cubic-bezier(.16,1,.3,1); }
+.sync-proof b { color: var(--t-1); font-weight: 650; }
+@media (prefers-color-scheme: dark) {
+  .sync-proof { background: rgba(32,30,26,0.52); }
+}
+
 /* ── Promo + alert cards ─────────────────────────────────── */
 .promo-card {
   display: none; align-items: center; gap: 12px;
@@ -345,6 +383,91 @@ body {
 .alert-text { flex: 1; font-size: 13px; color: var(--t-1); line-height: 1.35; }
 .alert-text b { color: var(--amber); font-weight: 600; }
 .alert-btn { font-size: 13px; font-weight: 600; color: var(--amber); background: none; border: none; cursor: pointer; font-family: inherit; }
+
+.vault-status {
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-card);
+  background:
+    linear-gradient(150deg, rgba(255,253,248,0.84), rgba(239,233,222,0.54)),
+    var(--surf-1);
+  box-shadow: var(--sh-card);
+  padding: 13px;
+  margin-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+}
+.vault-status::after {
+  content: "";
+  position: absolute;
+  inset: auto -24px -36px auto;
+  width: 118px;
+  height: 118px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  pointer-events: none;
+}
+.vault-kicker {
+  font-size: 10.5px;
+  font-weight: 750;
+  color: var(--brand);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  position: relative;
+  z-index: 1;
+}
+.vault-title {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  margin-bottom: 4px;
+  position: relative;
+  z-index: 1;
+}
+.vault-copy {
+  color: var(--t-2);
+  font-size: 12.5px;
+  line-height: 1.5;
+  max-width: 260px;
+  position: relative;
+  z-index: 1;
+}
+.vault-proof-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 11px;
+  position: relative;
+  z-index: 1;
+}
+.vault-proof {
+  border: 1px solid var(--sep);
+  border-radius: 8px;
+  padding: 8px 6px;
+  background: rgba(255,255,255,0.38);
+  text-align: center;
+}
+.vault-proof b {
+  display: block;
+  color: var(--t-1);
+  font-size: 11.5px;
+  font-weight: 750;
+  margin-bottom: 2px;
+}
+.vault-proof span {
+  display: block;
+  color: var(--t-3);
+  font-size: 10px;
+  font-weight: 650;
+}
+@media (prefers-color-scheme: dark) {
+  .vault-status {
+    background:
+      linear-gradient(150deg, rgba(32,30,26,0.78), rgba(22,36,34,0.46)),
+      var(--surf-1);
+  }
+  .vault-proof { background: rgba(255,255,255,0.025); }
+}
 
 /* ── List rows ──────────────────────────────────────────── */
 .list-section {
@@ -400,6 +523,22 @@ body {
 }
 .section-footer { font-size: 12px; color: var(--t-2); padding: 6px 3px 0; line-height: 1.5; }
 .section-footer a { color: var(--brand); text-decoration: none; }
+
+.empty-state {
+  padding: 22px 18px;
+  text-align: center;
+  color: var(--t-2);
+}
+.empty-state b {
+  display: block;
+  color: var(--t-1);
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.empty-state span {
+  font-size: 12.5px;
+  line-height: 1.5;
+}
 
 /* ── Inputs ─────────────────────────────────────────────── */
 .field { margin-bottom: 10px; }
@@ -530,6 +669,7 @@ body {
 
 /* ── Hero sections ──────────────────────────────────────── */
 .hero { text-align: center; padding: 12px 4px 20px; }
+#vSignIn .hero { padding: 18px 0 22px; }
 .hero-icon {
   width: 58px; height: 58px; border-radius: 8px;
   background: var(--brand-soft);
@@ -543,6 +683,128 @@ body {
 .hero-icon.success svg { stroke: var(--teal); }
 .hero-title { font-size: 23px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 5px; }
 .hero-sub { font-size: 14px; color: var(--t-2); line-height: 1.55; max-width: 256px; margin: 0 auto; }
+
+.setup-promise {
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-card);
+  background: linear-gradient(145deg, rgba(255,253,248,0.82), rgba(239,233,222,0.52));
+  box-shadow: var(--sh-card);
+  padding: 13px;
+  margin: 2px 0 14px;
+}
+.promise-title {
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  margin-bottom: 5px;
+}
+.promise-copy {
+  font-size: 12.5px;
+  color: var(--t-2);
+  line-height: 1.5;
+}
+.setup-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 11px;
+}
+.setup-step {
+  border: 1px solid var(--sep);
+  border-radius: 8px;
+  padding: 8px 6px;
+  color: var(--t-2);
+  font-size: 10.5px;
+  font-weight: 650;
+  text-align: center;
+  background: rgba(255,255,255,0.38);
+}
+.setup-step b {
+  display: block;
+  color: var(--brand);
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+@media (prefers-color-scheme: dark) {
+  .setup-promise {
+    background: linear-gradient(145deg, rgba(32,30,26,0.78), rgba(22,36,34,0.46));
+  }
+  .setup-step { background: rgba(255,255,255,0.025); }
+}
+
+.browser-stack {
+  width: 182px;
+  height: 86px;
+  margin: 0 auto 18px;
+  position: relative;
+}
+.browser-card {
+  position: absolute;
+  width: 82px;
+  height: 50px;
+  border-radius: 10px;
+  background: rgba(255,253,248,0.78);
+  border: 1px solid rgba(38,34,27,0.12);
+  box-shadow: 0 14px 32px rgba(38,34,27,0.09), inset 0 1px 0 rgba(255,255,255,0.7);
+  overflow: hidden;
+}
+.browser-card::before {
+  content: '';
+  display: block;
+  height: 12px;
+  background: linear-gradient(90deg, rgba(12,110,110,0.14), rgba(166,95,24,0.10));
+  border-bottom: 1px solid rgba(38,34,27,0.06);
+}
+.browser-card::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 24px;
+  height: 4px;
+  border-radius: 99px;
+  background: rgba(36,32,25,0.16);
+  box-shadow: 0 11px 0 rgba(36,32,25,0.08);
+}
+.browser-card.one { left: 0; top: 20px; transform: rotate(-5deg); }
+.browser-card.two { right: 0; top: 20px; transform: rotate(5deg); }
+.browser-card.three { left: 50px; top: 0; transform: translateY(3px); }
+.relay-seal {
+  position: absolute;
+  left: 64px;
+  bottom: 0;
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: var(--brand-grad);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.22), 0 18px 34px rgba(12,110,110,0.28);
+}
+.relay-seal svg {
+  width: 27px;
+  height: 27px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: sealFlow 2.8s ease-in-out infinite;
+}
+@keyframes sealFlow {
+  0%, 100% { transform: translateX(0); opacity: 0.92; }
+  45% { transform: translateX(2px); opacity: 1; }
+}
+@media (prefers-color-scheme: dark) {
+  .browser-card {
+    background: rgba(32,30,26,0.78);
+    border-color: rgba(250,246,237,0.10);
+    box-shadow: 0 14px 34px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.045);
+  }
+  .browser-card::before { border-bottom-color: rgba(250,246,237,0.06); }
+  .browser-card::after { background: rgba(251,247,239,0.18); box-shadow: 0 11px 0 rgba(251,247,239,0.10); }
+}
 
 /* ── Info cards (Settings) ───────────────────────────────── */
 .info-card {
@@ -580,6 +842,39 @@ body {
 
 .privacy-note { font-size: 12.5px; color: var(--t-3); text-align: center; margin: 10px 0 4px; line-height: 1.55; }
 .privacy-note b { color: var(--t-2); font-weight: 500; }
+.trust-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin: 10px 0 12px;
+}
+.trust-chip {
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-card);
+  background: linear-gradient(180deg, rgba(255,253,248,0.78), rgba(248,244,236,0.58));
+  color: var(--t-2);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 8px 8px;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(38,34,27,0.045), inset 0 1px 0 rgba(255,255,255,0.72);
+}
+.trust-chip::before {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 6px;
+  border-radius: 999px;
+  background: var(--teal);
+  box-shadow: 0 0 0 3px var(--teal-soft);
+}
+@media (prefers-color-scheme: dark) {
+  .trust-chip {
+    background: linear-gradient(180deg, rgba(32,30,26,0.68), rgba(26,24,21,0.58));
+    box-shadow: 0 8px 22px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+}
 
 /* ── Toast ───────────────────────────────────────────────── */
 .toast {
@@ -607,28 +902,31 @@ body {
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="relay-logo-mark" viewBox="0 0 20 20">
+    <rect x="2" y="5" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.95)"/>
+    <polygon points="11,2.5 15.5,6.1 11,9.7" fill="rgba(255,255,255,0.95)"/>
+    <rect x="8" y="12.8" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.72)"/>
+    <polygon points="9,10.3 4.5,13.9 9,17.5" fill="rgba(255,255,255,0.72)"/>
+  </symbol>
+</svg>
 
 <!-- SIGN IN -->
 <div id="vSignIn" class="view active">
   <div class="nav">
-    <div class="logo">
-      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Top arrow: right-pointing, upper area -->
-  <rect x="2" y="5" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.95)"/>
-  <polygon points="11,2.5 15.5,6.1 11,9.7" fill="rgba(255,255,255,0.95)"/>
-  <!-- Bottom arrow: left-pointing, lower area, offset right -->
-  <rect x="8" y="12.8" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.72)"/>
-  <polygon points="9,10.3 4.5,13.9 9,17.5" fill="rgba(255,255,255,0.72)"/>
-</svg>
-    </div>
+    <div class="logo"><svg viewBox="0 0 20 20"><use href="#relay-logo-mark"></use></svg></div>
     <span class="nav-title">Relay</span>
   </div>
   <div class="hero">
-    <div class="hero-icon">
-      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <div class="browser-stack" aria-hidden="true">
+      <div class="browser-card one"></div>
+      <div class="browser-card two"></div>
+      <div class="browser-card three"></div>
+      <div class="relay-seal">
+        <svg viewBox="0 0 24 24"><path d="M4 7h11"/><path d="M12 4l3 3-3 3"/><path d="M20 17H9"/><path d="M12 14l-3 3 3 3"/></svg>
+      </div>
     </div>
-    <div class="hero-title">Bookmarks, in sync.</div>
-    <div class="hero-sub">Sign in to access your encrypted vault.</div>
+    <div class="hero-title">Different browsers. Same bookmarks.</div>
   </div>
   <div class="field">
     <div class="field-label">Username</div>
@@ -646,11 +944,15 @@ body {
       </button>
     </div>
   </div>
-  <button class="btn btn-primary" id="btnSignIn">Sign In</button>
-  <div class="privacy-note">No reset email. <b>Your password is the key.</b><br>Keep it safe. Relay keeps everything else simple.</div>
+  <button class="btn btn-primary" id="btnSignIn">Sign in</button>
+  <div class="privacy-note">No email account. No tracking profile. <b>Your password unlocks the vault.</b></div>
+  <div class="trust-strip" aria-label="Privacy highlights">
+    <div class="trust-chip">Encrypted vault</div>
+    <div class="trust-chip">Chrome, Edge, Brave+</div>
+  </div>
   <div class="divider"></div>
   <div style="text-align:center">
-    <button class="btn-text" id="btnNewUserSignIn">New to Relay? Create account →</button>
+    <button class="btn-text" id="btnNewUserSignIn">New here? Create your sync vault →</button>
   </div>
   <div class="toast" id="toastSignIn"></div>
 </div>
@@ -658,18 +960,18 @@ body {
 <!-- SETUP -->
 <div id="vSetup" class="view">
   <div class="nav">
-    <div class="logo">
-      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Top arrow: right-pointing, upper area -->
-  <rect x="2" y="5" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.95)"/>
-  <polygon points="11,2.5 15.5,6.1 11,9.7" fill="rgba(255,255,255,0.95)"/>
-  <!-- Bottom arrow: left-pointing, lower area, offset right -->
-  <rect x="8" y="12.8" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.72)"/>
-  <polygon points="9,10.3 4.5,13.9 9,17.5" fill="rgba(255,255,255,0.72)"/>
-</svg>
-    </div>
-    <span class="nav-title">Create Vault</span>
+    <div class="logo"><svg viewBox="0 0 20 20"><use href="#relay-logo-mark"></use></svg></div>
+    <span class="nav-title">Create vault</span>
     <div class="nav-right"><button class="done-btn" id="btnBackSetup">Back</button></div>
+  </div>
+  <div class="setup-promise">
+    <div class="promise-title">One encrypted vault for every browser.</div>
+    <div class="promise-copy">Create it once. Sign in anywhere Relay is installed. Your bookmarks follow without exports, imports, or cleanup chores.</div>
+    <div class="setup-steps" aria-label="Setup steps">
+      <div class="setup-step"><b>1</b>Name it</div>
+      <div class="setup-step"><b>2</b>Save password</div>
+      <div class="setup-step"><b>3</b>Sync</div>
+    </div>
   </div>
   <div class="field">
     <div class="field-label">Choose a username</div>
@@ -695,7 +997,7 @@ body {
         </button>
       </div>
     </div>
-    <div style="font-size:12px;color:var(--t-3);text-align:center;margin:4px 0 8px">Use this password or type your own.</div>
+    <div style="font-size:12px;color:var(--t-3);text-align:center;margin:4px 0 8px">Use the generated password or choose your own.</div>
     <div class="input-wrap">
       <input class="input" id="passInput" type="password" placeholder="Password" autocomplete="new-password">
       <button class="input-eye" id="passEye" aria-label="Show password">
@@ -716,52 +1018,34 @@ body {
     <div class="pass-match" id="passMatchStatus"></div>
   </div>
   <div class="notice amber">
-    <b>Save your password.</b> It unlocks your vault. If it is lost, it cannot be recovered.
+    <b>Save this password.</b> It unlocks the encrypted vault. Relay cannot reset or recover it later.
   </div>
-  <button class="btn btn-primary" id="btnCreate" disabled>Create Vault →</button>
+  <button class="btn btn-primary" id="btnCreate" disabled>Create vault →</button>
   <div class="toast" id="toastSetup"></div>
 </div>
 
 <!-- WELCOME -->
 <div id="vWelcome" class="view" style="text-align:center">
   <div class="nav" style="justify-content:center">
-    <div class="logo">
-      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Top arrow: right-pointing, upper area -->
-  <rect x="2" y="5" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.95)"/>
-  <polygon points="11,2.5 15.5,6.1 11,9.7" fill="rgba(255,255,255,0.95)"/>
-  <!-- Bottom arrow: left-pointing, lower area, offset right -->
-  <rect x="8" y="12.8" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.72)"/>
-  <polygon points="9,10.3 4.5,13.9 9,17.5" fill="rgba(255,255,255,0.72)"/>
-</svg>
-    </div>
+    <div class="logo"><svg viewBox="0 0 20 20"><use href="#relay-logo-mark"></use></svg></div>
     <span class="nav-title">Relay</span>
   </div>
   <div class="hero" style="padding-top:22px">
     <div class="hero-icon success">
       <svg viewBox="0 0 24 24" style="stroke-width:2.2"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
-    <div class="hero-title">Vault ready.</div>
-    <div class="hero-sub">Relay is encrypting and syncing your bookmarks.</div>
+    <div class="hero-title">Your vault is ready.</div>
+    <div class="hero-sub">Install Relay in another Chromium browser, sign in, and your bookmarks follow.</div>
   </div>
   <div class="notice info" style="text-align:left">
-    <b>Sync another browser?</b> Install Relay there and sign in with the same username and password.
+    <b>No exporting. No rebuilding.</b> Same username, same password, same encrypted vault.
   </div>
 </div>
 
 <!-- MAIN -->
 <div id="vMain" class="view">
   <div class="nav">
-    <div class="logo">
-      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Top arrow: right-pointing, upper area -->
-  <rect x="2" y="5" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.95)"/>
-  <polygon points="11,2.5 15.5,6.1 11,9.7" fill="rgba(255,255,255,0.95)"/>
-  <!-- Bottom arrow: left-pointing, lower area, offset right -->
-  <rect x="8" y="12.8" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.72)"/>
-  <polygon points="9,10.3 4.5,13.9 9,17.5" fill="rgba(255,255,255,0.72)"/>
-</svg>
-    </div>
+    <div class="logo"><svg viewBox="0 0 20 20"><use href="#relay-logo-mark"></use></svg></div>
     <span class="nav-title">Relay</span>
     <div class="nav-right"><span class="badge" id="mainChip">FREE</span></div>
   </div>
@@ -772,14 +1056,25 @@ body {
     </div>
     <div class="promo-text">
       <b>Relay Pro</b>
-      <span>Unlimited bookmarks · auto-sync · restore history</span>
+      <span>More browsers, more bookmarks, automatic sync, and restore history</span>
     </div>
     <span class="promo-arrow">$18/yr →</span>
   </button>
 
   <div class="alert-card" id="upgradeAlert">
-    <div class="alert-text"><b>Bookmark limit reached.</b> Upgrade to sync everything.</div>
+    <div class="alert-text"><b>Vault limit reached.</b> Pro keeps the whole bookmark library moving.</div>
     <button class="alert-btn" id="upgradeAlertBtn">Upgrade →</button>
+  </div>
+
+  <div class="vault-status">
+    <div class="vault-kicker">Encrypted vault</div>
+    <div class="vault-title">This browser has the same library.</div>
+    <div class="vault-copy">Sync compares this browser with your encrypted vault, adds what is missing, then confirms the count.</div>
+    <div class="vault-proof-grid" aria-label="Vault guarantees">
+      <div class="vault-proof"><b>Private</b><span>No readable cloud copy</span></div>
+      <div class="vault-proof"><b>Current</b><span id="vaultSyncState">Ready to compare</span></div>
+      <div class="vault-proof"><b>Portable</b><span>Chrome, Edge, Brave+</span></div>
+    </div>
   </div>
 
   <button class="sync-hero" id="btnSync">
@@ -796,23 +1091,24 @@ body {
       </div>
       <div class="orb-pulse"></div>
     </div>
-    <div class="sync-title" id="orbLabel">Sync</div>
-    <div class="sync-sub" id="orbSub">Encrypt and update your vault.</div>
+    <div class="sync-title" id="orbLabel">Sync bookmarks</div>
+    <div class="sync-sub" id="orbSub">Encrypt, compare, and bring this browser up to date.</div>
     <div class="sync-stats" id="syncStats">
       <div class="stat">
         <div class="stat-val" id="statCount">—</div>
-        <div class="stat-lbl">Bookmarks</div>
+        <div class="stat-lbl">Vault bookmarks</div>
       </div>
       <div class="stat-divider"></div>
       <div class="stat">
         <div class="stat-val" id="statTime">—</div>
-        <div class="stat-lbl">Last sync</div>
+        <div class="stat-lbl">Last confirmed</div>
       </div>
     </div>
     <div class="sync-dots">
       <div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
   </button>
+  <div class="sync-proof" id="syncProof"></div>
 
   <div class="list-section">
     <div class="list-row" style="align-items:center">
@@ -822,8 +1118,8 @@ body {
         </svg>
       </div>
       <div class="row-content">
-        <div class="row-title" style="font-size:14px;font-weight:500">Auto-sync</div>
-        <div class="row-subtitle">Syncs on every change · Pro</div>
+        <div class="row-title" style="font-size:14px;font-weight:500">Auto-sync changes</div>
+        <div class="row-subtitle">Adds, edits, and deletes follow every browser · Pro</div>
       </div>
       <label class="toggle">
         <input type="checkbox" id="chkAuto">
@@ -838,7 +1134,7 @@ body {
       </div>
       <div class="row-content">
         <div class="row-title" id="mainUsername">—</div>
-        <div class="row-subtitle" id="mainPlanHint">Free plan</div>
+        <div class="row-subtitle" id="mainPlanHint">Vault & privacy</div>
       </div>
       <div class="row-trailing">
         <svg viewBox="0 0 20 20"><path d="M7 5l5 5-5 5"/></svg>
@@ -852,32 +1148,23 @@ body {
 <!-- SETTINGS -->
 <div id="vSecurity" class="view">
   <div class="nav">
-    <div class="logo">
-      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Top arrow: right-pointing, upper area -->
-  <rect x="2" y="5" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.95)"/>
-  <polygon points="11,2.5 15.5,6.1 11,9.7" fill="rgba(255,255,255,0.95)"/>
-  <!-- Bottom arrow: left-pointing, lower area, offset right -->
-  <rect x="8" y="12.8" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.72)"/>
-  <polygon points="9,10.3 4.5,13.9 9,17.5" fill="rgba(255,255,255,0.72)"/>
-</svg>
-    </div>
+    <div class="logo"><svg viewBox="0 0 20 20"><use href="#relay-logo-mark"></use></svg></div>
     <span class="nav-title">Settings</span>
     <div class="nav-right"><button class="done-btn" id="btnBackMain">Done</button></div>
   </div>
 
-  <div class="section-header">Plan</div>
+	  <div class="section-header">Vault plan</div>
   <div class="info-card">
     <div class="info-head">
       <div class="info-icon">
         <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
       </div>
-      <div class="info-title" id="secPlanTitle">Free Plan</div>
+      <div class="info-title" id="secPlanTitle">Free vault</div>
       <span class="badge" id="secChip">FREE</span>
     </div>
-  <div class="info-body" id="secPlanBody">Up to 500 bookmarks · 2 browsers · manual sync.</div>
+  <div class="info-body" id="secPlanBody">Free keeps 500 bookmarks across 2 Chromium browsers with manual sync.</div>
   </div>
-  <button class="btn btn-primary" id="btnUpgrade">Upgrade to Pro — $18/year</button>
+  <button class="btn btn-primary" id="btnUpgrade">Unlock the full vault - $18/year</button>
   <button class="btn btn-tinted" id="btnShowGift">
     <svg viewBox="0 0 24 24"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
     Redeem gift code
@@ -895,7 +1182,7 @@ body {
       </div>
       <div class="info-title" id="updateTitle">Updates</div>
     </div>
-    <div class="info-body" id="updateBody">Check for a newer versioned Relay build. Updates stay user-approved.</div>
+    <div class="info-body" id="updateBody">Check for the latest versioned build. Relay never swaps files behind your back.</div>
     <div class="update-actions">
       <button class="btn btn-tinted" id="btnCheckUpdate">Check</button>
       <button class="btn btn-secondary" id="btnInstallGuide">Guide</button>
@@ -904,24 +1191,33 @@ body {
     <div class="update-meta" id="updateMeta"></div>
   </div>
 
-  <div class="section-header">Privacy</div>
+  <div class="section-header">How Relay protects you</div>
   <div class="info-card">
     <div class="info-head">
       <div class="info-icon">
         <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       </div>
-    <div class="info-title">Private by default</div>
+    <div class="info-title">Encrypted before upload</div>
     </div>
-  <div class="info-body">Bookmarks are encrypted on your device before sync. <b>Nobody can read them</b> - not even us.</div>
+  <div class="info-body">Bookmark data is encrypted in this browser before it touches Relay. <b>Your password never leaves the browser.</b></div>
   </div>
   <div class="info-card">
     <div class="info-head">
       <div class="info-icon">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
       </div>
-      <div class="info-title">No email. No tracking.</div>
+      <div class="info-title">No account profile</div>
     </div>
-    <div class="info-body">No email. No name. No tracking. Relay keeps account data minimal.</div>
+    <div class="info-body">No email, no name, no analytics SDK, no tracking pixels. Just enough encrypted data to keep bookmarks in sync.</div>
+  </div>
+  <div class="info-card">
+    <div class="info-head">
+      <div class="info-icon">
+        <svg viewBox="0 0 24 24"><path d="M4 7h11"/><path d="M12 4l3 3-3 3"/><path d="M20 17H9"/><path d="M12 14l-3 3 3 3"/></svg>
+      </div>
+      <div class="info-title">Built for browser drift</div>
+    </div>
+    <div class="info-body">Chrome, Edge, Brave, Arc, Opera, and other Chromium browsers can share one vault instead of manual bookmark exports.</div>
   </div>
 
   <div class="section-header">Account</div>
@@ -939,25 +1235,16 @@ body {
 <!-- GIFT CODE -->
 <div id="vGift" class="view">
   <div class="nav">
-    <div class="logo">
-      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Top arrow: right-pointing, upper area -->
-  <rect x="2" y="5" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.95)"/>
-  <polygon points="11,2.5 15.5,6.1 11,9.7" fill="rgba(255,255,255,0.95)"/>
-  <!-- Bottom arrow: left-pointing, lower area, offset right -->
-  <rect x="8" y="12.8" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.72)"/>
-  <polygon points="9,10.3 4.5,13.9 9,17.5" fill="rgba(255,255,255,0.72)"/>
-</svg>
-    </div>
-    <span class="nav-title">Gift Code</span>
+    <div class="logo"><svg viewBox="0 0 20 20"><use href="#relay-logo-mark"></use></svg></div>
+    <span class="nav-title">Gift code</span>
     <div class="nav-right"><button class="done-btn" id="btnBackGift">Cancel</button></div>
   </div>
   <div class="hero">
     <div class="hero-icon">
       <svg viewBox="0 0 24 24"><path d="M20 12v10H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
     </div>
-    <div class="hero-title">Redeem code</div>
-    <div class="hero-sub">Activate Pro for this vault.</div>
+    <div class="hero-title">Redeem Pro</div>
+    <div class="hero-sub">Attach Pro to this encrypted vault, not an email account.</div>
   </div>
   <div class="input-wrap">
     <input class="input" id="giftInput" type="text" placeholder="XXXX-XXXX-XXXX"
@@ -971,28 +1258,19 @@ body {
 <!-- DELETE CONFIRM -->
 <div id="vDeleteConfirm" class="view">
   <div class="nav">
-    <div class="logo">
-      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Top arrow: right-pointing, upper area -->
-  <rect x="2" y="5" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.95)"/>
-  <polygon points="11,2.5 15.5,6.1 11,9.7" fill="rgba(255,255,255,0.95)"/>
-  <!-- Bottom arrow: left-pointing, lower area, offset right -->
-  <rect x="8" y="12.8" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.72)"/>
-  <polygon points="9,10.3 4.5,13.9 9,17.5" fill="rgba(255,255,255,0.72)"/>
-</svg>
-    </div>
-    <span class="nav-title">Delete Account</span>
+    <div class="logo"><svg viewBox="0 0 20 20"><use href="#relay-logo-mark"></use></svg></div>
+    <span class="nav-title">Delete account</span>
     <div class="nav-right"><button class="done-btn" id="btnDeleteCancel">Cancel</button></div>
   </div>
   <div class="hero">
     <div class="hero-icon danger">
       <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
     </div>
-    <div class="hero-title">Delete your account?</div>
-    <div class="hero-sub">Your encrypted vault will be permanently removed from our servers.</div>
+    <div class="hero-title">Delete the cloud vault?</div>
+    <div class="hero-sub">Relay removes the encrypted server copy. Local browser bookmarks stay where they are.</div>
   </div>
   <div class="notice amber">
-    <b>This cannot be undone.</b> Your local bookmarks stay safe — only the cloud vault is deleted. If you have Pro, <a href="https://billing.stripe.com" target="_blank" rel="noopener noreferrer">cancel Stripe first</a>.
+    <b>This cannot be undone.</b> Your local bookmarks stay safe. If you have Pro, <a href="https://billing.stripe.com" target="_blank" rel="noopener noreferrer">cancel Stripe first</a>.
   </div>
   <button class="btn btn-danger" id="btnDeleteConfirm">Yes, delete my account</button>
   <button class="btn btn-secondary" id="btnDeleteCancel2">Keep my account</button>
@@ -1011,51 +1289,33 @@ body {
 <!-- SYNC HISTORY -->
 <div id="vHistory" class="view">
   <div class="nav">
-    <div class="logo">
-      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Top arrow: right-pointing, upper area -->
-  <rect x="2" y="5" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.95)"/>
-  <polygon points="11,2.5 15.5,6.1 11,9.7" fill="rgba(255,255,255,0.95)"/>
-  <!-- Bottom arrow: left-pointing, lower area, offset right -->
-  <rect x="8" y="12.8" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.72)"/>
-  <polygon points="9,10.3 4.5,13.9 9,17.5" fill="rgba(255,255,255,0.72)"/>
-</svg>
-    </div>
-    <span class="nav-title">Sync History</span>
+    <div class="logo"><svg viewBox="0 0 20 20"><use href="#relay-logo-mark"></use></svg></div>
+    <span class="nav-title">Sync history</span>
     <div class="nav-right"><button class="done-btn" id="btnBackHistory">Done</button></div>
   </div>
-  <div class="section-header">Last 30 days</div>
+  <div class="section-header">Encrypted snapshots</div>
   <div class="list-section" id="historyList" style="overflow:hidden"></div>
-  <div class="section-footer">Tap any snapshot to restore it. Your current bookmarks are merged — nothing is lost.</div>
+  <div class="section-footer">Restore is additive: missing bookmarks come back, current bookmarks stay.</div>
 </div>
 
 <!-- RESTORE CONFIRM -->
 <div id="vRestoreConfirm" class="view">
   <div class="nav">
-    <div class="logo">
-      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Top arrow: right-pointing, upper area -->
-  <rect x="2" y="5" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.95)"/>
-  <polygon points="11,2.5 15.5,6.1 11,9.7" fill="rgba(255,255,255,0.95)"/>
-  <!-- Bottom arrow: left-pointing, lower area, offset right -->
-  <rect x="8" y="12.8" width="10" height="2.2" rx="1.1" fill="rgba(255,255,255,0.72)"/>
-  <polygon points="9,10.3 4.5,13.9 9,17.5" fill="rgba(255,255,255,0.72)"/>
-</svg>
-    </div>
-    <span class="nav-title">Restore Snapshot</span>
+    <div class="logo"><svg viewBox="0 0 20 20"><use href="#relay-logo-mark"></use></svg></div>
+    <span class="nav-title">Restore snapshot</span>
     <div class="nav-right"><button class="done-btn" id="btnRestoreCancel">Cancel</button></div>
   </div>
   <div class="hero">
     <div class="hero-icon">
       <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/></svg>
     </div>
-    <div class="hero-title">Restore this snapshot?</div>
-    <div class="hero-sub">Missing bookmarks will be added back. Nothing gets deleted.</div>
+    <div class="hero-title">Bring missing bookmarks back?</div>
+    <div class="hero-sub">Relay decrypts this snapshot locally, then adds anything missing.</div>
   </div>
   <div class="notice info">
-    <b>Completely safe.</b> Restore is additive only — your current bookmarks are kept and missing ones are merged back in.
+    <b>Additive restore.</b> Current bookmarks stay. Missing bookmarks from this encrypted snapshot are merged back in.
   </div>
-  <button class="btn btn-primary" id="btnRestoreConfirm">Restore snapshot →</button>
+  <button class="btn btn-primary" id="btnRestoreConfirm">Add missing bookmarks →</button>
   <button class="btn btn-secondary" id="btnRestoreCancel2">Cancel</button>
   <div class="toast" id="toastRestore"></div>
 </div>

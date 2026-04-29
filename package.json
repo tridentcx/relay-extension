@@ -1,12 +1,13 @@
 {
   "name": "relay-extension",
-  "version": "1.0.9",
+  "version": "2.0.0",
   "private": true,
-  "description": "Simple private bookmark sync browser extension.",
+  "description": "Private bookmark sync for people who use more than one browser.",
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {
-    "check": "node --check sync.js && node --check popup.js && node --check background.js && node --check crypto.js && node scripts/verify-version-bump.js && node tests/static-contracts.test.js",
+    "check": "node --check sync.js && node --check popup.js && node --check background.js && node --check crypto.js && node scripts/verify-version-bump.js && node scripts/security-scan.js && node tests/static-contracts.test.js",
     "test": "node tests/static-contracts.test.js",
+    "security:scan": "node scripts/security-scan.js",
     "bump:version": "node scripts/bump-version.js",
     "assets:store": "node scripts/generate-store-assets.js",
     "package": "bash scripts/package-extension.sh",

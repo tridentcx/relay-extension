@@ -25,7 +25,9 @@ FILES=(
   popup-loader.js \
   popup.js \
   config.json \
-  icons
+  icons/icon16.png \
+  icons/icon48.png \
+  icons/icon128.png
 )
 
 zip -r "$OUT_FILE" "${FILES[@]}" -x '*.DS_Store'

@@ -1,6 +1,6 @@
-# Install Relay from GitHub
+# Install Relay
 
-Relay is distributed as a downloadable extension package through GitHub Releases.
+Relay is distributed as a versioned extension package through GitHub Releases. Download it, unzip it, and load the folder in your browser.
 
 ## Download
 
@@ -28,15 +28,19 @@ After downloading, unzip the file. You should see files such as `manifest.json`,
 4. Select the unzipped Relay folder.
 5. Pin Relay from the extensions menu if you want quick access.
 
+## Install in other Chromium-based browsers
+
+Most Chromium-based browsers support the same unpacked-extension flow. Open that browser's extensions page, enable Developer Mode, choose **Load unpacked**, and select the unzipped Relay folder.
+
 ## Use Relay
 
 1. Open the Relay extension.
 2. Create a username and save the generated password somewhere safe.
-3. Click **Sync Now** to upload your encrypted bookmark vault.
-4. On another browser, install Relay and sign in with the same username and password.
-5. Click **Sync Now** to bring your bookmarks over.
+3. Click **Sync** to upload your encrypted bookmark vault.
+4. On another supported browser, install Relay and sign in with the same username and password.
+5. Click **Sync** to bring your bookmarks over.
 
-Relay cannot reset your password. If you lose it, your encrypted bookmark vault cannot be recovered by Relay.
+Relay cannot reset your password. If you lose it, Relay cannot decrypt the vault.
 
 ## Update Relay
 
@@ -51,14 +55,14 @@ Unpacked browser extensions cannot safely replace their own files in the backgro
 5. Load the new unzipped Relay folder.
 6. Sign in again if the browser asks you to.
 
-Your cloud vault is encrypted and remains available as long as you know your username and password.
+Your cloud vault stays encrypted and available as long as you know your username and password.
 
 ## Troubleshooting
 
 - If **Load unpacked** is missing, confirm Developer mode is enabled.
 - If the browser says the manifest is missing, select the unzipped folder that directly contains `manifest.json`.
 - If sync fails, check your internet connection and try again.
-- If sign-in fails on a second browser, confirm the username and password match exactly.
+- If sign-in fails on another browser, confirm the username and password match exactly.
 - If you hit a plan limit, upgrade or remove an older browser registration by deleting the account and starting fresh only if you are sure you no longer need the old cloud vault.
 
 For support, open an issue:

@@ -4,11 +4,11 @@
 
 ## The Short Version
 
-Relay does not ask for your name or email, does not use analytics SDKs, and is designed so bookmark contents are encrypted before sync. The service stores an encrypted vault, not a readable bookmark profile.
+Relay does not ask for your name or email, does not use analytics SDKs, and encrypts bookmark contents before sync. The service stores an encrypted vault, not a readable bookmark profile.
 
 ## What We Collect
 
-Relay stores the minimum data needed to operate private bookmark sync:
+Relay stores the minimum data needed to operate encrypted bookmark sync:
 
 - **Encrypted vault:** your bookmark data after it has been encrypted on your device.
 - **Vault lookup key:** a derived identifier used to find your vault without storing your username in plain text.

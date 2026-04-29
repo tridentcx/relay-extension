@@ -212,6 +212,13 @@ const toast=(id,msg,t)=>{
   if(e._dismissTimer)clearTimeout(e._dismissTimer);
   e._dismissTimer=setTimeout(()=>{e.className='toast';},t==='err'?5000:3000);
 };
+function showSyncProof(message){
+  const e=q('syncProof');
+  if(!e)return;
+  if(!message){e.textContent='';e.classList.remove('show');return;}
+  e.textContent=message;
+  e.classList.add('show');
+}
 
 function age(iso){
   if(!iso)return '—';
@@ -232,6 +239,48 @@ const RELEASES_URL='https://github.com/trident-cx/relay-extension/releases';
 const INSTALL_GUIDE_URL='https://github.com/trident-cx/relay-extension/blob/main/docs/INSTALL.md';
 const UPDATE_CACHE_MAX_MS=24*60*60*1000;
 let updateDownloadUrl=RELEASES_URL;
+
+const TRUSTED_EXTERNAL_HOSTS = new Set([
+  'relayextension.com',
+  'github.com',
+  'checkout.stripe.com',
+  'billing.stripe.com',
+]);
+
+function trustedExternalUrl(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' && TRUSTED_EXTERNAL_HOSTS.has(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
+
+function openTrustedUrl(url, fallback=RELEASES_URL) {
+  const safeUrl = trustedExternalUrl(url) ? url : fallback;
+  chrome.tabs.create({url:safeUrl});
+}
+
+const ORB_ICONS = {
+  sync: '<svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>',
+  check: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
+  bolt: '<svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+  wrench: '<svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
+  clock: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 10"/></svg>',
+  alert: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+};
+
+function setOrbIcon(name) {
+  const icon = q('orbIco');
+  if (icon) icon.innerHTML = ORB_ICONS[name] || ORB_ICONS.sync;
+}
+
+function setOrbText(label, sub='') {
+  const labelEl = q('orbLabel');
+  const subEl = q('orbSub');
+  if (labelEl) labelEl.textContent = label;
+  if (subEl) subEl.textContent = sub;
+}
 
 function currentVersion(){
   try{return chrome.runtime.getManifest().version;}catch{return '0.0.0';}
@@ -276,14 +325,14 @@ function renderUpdateStatus(state){
   }
   if(state?.status==='available'){
     title.textContent=`Relay v${state.latestVersion} is available`;
-    body.textContent='Download the versioned build, unzip it, then reload Relay from your browser extensions page.';
+    body.textContent='Download the zip, unzip it, then reload Relay from the extensions page.';
     meta.textContent=`Installed: v${installed} · Stable build: relay-extension-stable-v${state.latestVersion}.zip`;
     download.style.display='flex';
     return;
   }
   if(state?.status==='current'){
     title.textContent='Relay is up to date';
-    body.textContent='You are running the latest published GitHub Release.';
+    body.textContent='You already have the newest published build.';
     meta.textContent=`Installed: v${installed} · Latest: v${state.latestVersion||installed}`;
     return;
   }
@@ -295,13 +344,13 @@ function renderUpdateStatus(state){
   }
   if(state?.status==='error'){
     title.textContent='Could not check updates';
-    body.textContent='GitHub Releases could not be reached right now. You can still use the install guide to check manually.';
+    body.textContent='GitHub Releases did not answer. The install guide still has the manual path.';
     meta.textContent=state.message||`Installed: v${installed}`;
     return;
   }
 
   title.textContent='Updates';
-  body.textContent='Check for the newest versioned build. Browser security keeps updates user-approved.';
+  body.textContent='Check for the latest versioned build. Nothing updates without you.';
   meta.textContent=`Installed: v${installed}`;
 }
 
@@ -348,11 +397,11 @@ async function openUpgrade(){
       return;
     }
     if (data?.url) {
-      chrome.tabs.create({url:data.url});
+      openTrustedUrl(data.url, PRICING_URL);
       return;
     }
   } catch {}
-  chrome.tabs.create({url:PRICING_URL});
+  openTrustedUrl(PRICING_URL);
 }
 
 function applyPlan(plan){
@@ -383,7 +432,7 @@ function applyPlan(plan){
 
   // Update main screen hint
   const hint=q('mainPlanHint');
-  if(hint)hint.textContent=isPro?'Pro plan · All features':'Free plan · 500 bookmarks';
+  if(hint)hint.textContent=isPro?'Pro vault · Every browser in sync':'Free vault · 500 bookmarks';
 
   // Show/hide upgrade teaser
   const t=q('upgTeaser');
@@ -393,8 +442,8 @@ function applyPlan(plan){
   const pt=q('secPlanTitle');
   const pb=q('secPlanBody');
   const ub=q('btnUpgrade');
-  if(pt)pt.textContent=isPro?'Relay Pro':'Free Plan';
-  if(pb)pb.textContent=isPro?'Unlimited browsers and bookmarks, auto-sync, safe restores.':'Up to 500 bookmarks, 2 browsers, manual sync.';
+  if(pt)pt.textContent=isPro?'Relay Pro':'Free vault';
+  if(pb)pb.textContent=isPro?'Unlimited Chromium browsers and bookmarks, auto-sync, and 30-day encrypted restore history.':'Free keeps 500 bookmarks across 2 Chromium browsers with manual sync.';
   if(ub)ub.style.display=isPro?'none':'flex';
 }
 
@@ -409,9 +458,8 @@ async function runSync(username, password){
   btn.disabled=true;
   btn.classList.remove('done','error');btn.classList.add('syncing');
   const orb=q('mainOrb');if(orb)orb.className='orb syncing';
-  q('orbIco').innerHTML=`<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>`;
-  q('orbLabel').textContent='Syncing…';
-    q('orbSub').textContent='Encrypting before upload…';
+  setOrbIcon('sync');
+  setOrbText('Syncing...', 'Encrypting before sync...');
   clrT('toastMain');
 
   try{
@@ -423,9 +471,11 @@ async function runSync(username, password){
 
     btn.classList.remove('syncing');btn.classList.add('done');
     if(orb)orb.className='orb done';
-    q('orbIco').innerHTML=`<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-    q('orbLabel').textContent=pulled>0?`${pulled} bookmark${pulled===1?'':'s'} added`:'Synced';
-    q('orbSub').textContent=`${count} bookmarks updated`;
+    setOrbIcon('check');
+    setOrbText(pulled>0?`${pulled} bookmark${pulled===1?'':'s'} added`:'Bookmarks in sync', `${count} bookmarks in the encrypted vault`);
+    showSyncProof(pulled>0
+      ? `${pulled} new bookmark${pulled===1?'':'s'} came from your encrypted vault. This browser is now current.`
+      : `No new bookmarks needed here. ${count} bookmark${count===1?'':'s'} confirmed in your encrypted vault.`);
 
     // Show persistent stats
     showStats(count, new Date().toISOString());
@@ -434,9 +484,8 @@ async function runSync(username, password){
     setTimeout(()=>{
       btn.disabled=false;btn.classList.remove('done');
       if(orb)orb.className='orb';
-      q('orbIco').innerHTML=`<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>`;
-      q('orbLabel').textContent='Sync';
-      q('orbSub').textContent=`Synced · ${age(new Date().toISOString())}`;
+      setOrbIcon('sync');
+      setOrbText('Sync bookmarks', `Synced · ${age(new Date().toISOString())}`);
     },3200);
 
   }catch(err){
@@ -446,19 +495,17 @@ async function runSync(username, password){
 
     if(err.message.startsWith('FREE_LIMIT:')){
       const c=err.message.split(':')[1];
-      q('orbIco').innerHTML=`<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`;
-      q('orbLabel').textContent='Upgrade to sync all';
-      q('orbSub').textContent=`${c} bookmarks — limit is 500`;
+      setOrbIcon('bolt');
+      setOrbText('Pro syncs your full library', `${c} bookmarks found. Free syncs 500.`);
       const al=q('upgradeAlert');if(al)al.classList.add('show');
       btn.classList.remove('error');
-      setTimeout(()=>{btn.disabled=false;if(orb)orb.className='orb';q('orbIco').innerHTML=`<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>`;},1500);
+      setTimeout(()=>{btn.disabled=false;if(orb)orb.className='orb';setOrbIcon('sync');},1500);
       return;
     }
     if(err.message.startsWith('BROWSER_LIMIT:')){
-      q('orbIco').innerHTML=`<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`;
-      q('orbLabel').textContent='Browser limit reached';
-      q('orbSub').textContent='Free plan supports 2 browsers';
-      toast('toastMain','Free tier supports 2 browsers. Upgrade to add more.','err');
+      setOrbIcon('bolt');
+      setOrbText('Browser limit reached', 'Free syncs 2 browsers');
+      toast('toastMain','Free syncs 2 browsers. Pro keeps every browser in sync.','err');
       // Show alert card with upgrade CTA
       const al=q('upgradeAlert');
       if(al){
@@ -468,47 +515,44 @@ async function runSync(username, password){
         if(txt)txt.innerHTML='<b>Browser limit reached.</b>';
       }
       btn.classList.remove('error');
-      setTimeout(()=>{btn.disabled=false;if(orb)orb.className='orb';q('orbIco').innerHTML=`<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>`;q('orbLabel').textContent='Try again';q('orbSub').textContent='';},2200);
+      setTimeout(()=>{btn.disabled=false;if(orb)orb.className='orb';setOrbIcon('sync');setOrbText('Try again');},2200);
       return;
     }
 
     if(err.message.startsWith('MAINTENANCE:')){
       const msg = err.message.split(':').slice(1).join(':');
-      q('orbIco').innerHTML=`<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`;
-      q('orbLabel').textContent='Maintenance';
-      q('orbSub').textContent = msg || 'Relay is temporarily down. Check back soon.';
+      setOrbIcon('wrench');
+      setOrbText('Maintenance', msg || 'Relay is temporarily down. Check back soon.');
       btn.classList.remove('error');
-      setTimeout(()=>{btn.disabled=false;if(orb)orb.className='orb';q('orbIco').innerHTML=`<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>`;q('orbLabel').textContent='Try again';q('orbSub').textContent='';},5000);
+      setTimeout(()=>{btn.disabled=false;if(orb)orb.className='orb';setOrbIcon('sync');setOrbText('Try again');},5000);
       return;
     }
     if(err.message.startsWith('RATE_LIMIT:')){
       const window = err.message.split(':')[1];
-      q('orbIco').innerHTML=`<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 10"/></svg>`;
-      q('orbLabel').textContent='Slow down';
-      q('orbSub').textContent = window === 'minute'
-        ? 'Syncing too fast — wait a moment'
-        : 'Hourly sync limit reached — try later';
+      setOrbIcon('clock');
+      setOrbText('Slow down', window === 'minute'
+        ? 'Syncing too fast. Wait a moment.'
+        : 'Hourly sync limit reached. Try later.');
       btn.classList.remove('error');
       setTimeout(()=>{
         btn.disabled=false;
         if(orb)orb.className='orb';
-        q('orbIco').innerHTML=`<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>`;
-        q('orbLabel').textContent='Sync';
-        q('orbSub').textContent='';
+        setOrbIcon('sync');
+        setOrbText('Sync bookmarks');
       }, window === 'minute' ? 15_000 : 60_000);
       return;
     }
 
-    q('orbIco').innerHTML=`<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
-    q('orbLabel').textContent='Sync failed';
-    q('orbSub').textContent='';
+    setOrbIcon('alert');
+    setOrbText('Sync failed');
     toast('toastMain',err.message,'err');
+    showSyncProof('');
     if(err.message.includes('password'))clearSession();
     setTimeout(()=>{
       btn.classList.remove('error');
       if(orb)orb.className='orb';
-      if(q('orbIco'))q('orbIco').innerHTML=`<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><polyline points="23 20 23 14 17 14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>`;
-      if(q('orbLabel'))q('orbLabel').textContent='Try again';
+      setOrbIcon('sync');
+      setOrbText('Try again');
     },2200);
   }
 }
@@ -522,6 +566,8 @@ function showStats(count, lastSync){
     stEl.textContent=age(lastSync);
     stats.classList.add('visible');
   }
+  const state=q('vaultSyncState');
+  if(state)state.textContent=lastSync ? age(lastSync) : 'Ready to compare';
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -541,11 +587,13 @@ async function goMain(initialSync=false){
 
   if(lastSync&&bmCount!=null){
     showStats(bmCount,lastSync);
-    q('orbLabel').textContent='Sync';
-    q('orbSub').textContent=`Synced · ${age(lastSync)}`;
+    setOrbText('Sync bookmarks', `Synced · ${age(lastSync)}`);
+    showSyncProof(`${bmCount.toLocaleString()} bookmark${bmCount===1?'':'s'} already confirmed in your encrypted vault.`);
   }else{
-    q('orbLabel').textContent='Sync';
-    q('orbSub').textContent='Encrypt and update your vault.';
+    setOrbText('Sync bookmarks', 'Encrypt, compare, and bring this browser up to date.');
+      showSyncProof('');
+      const state=q('vaultSyncState');
+      if(state)state.textContent='Ready to compare';
   }
 
   // [B-10] Re-verify plan from server, then update toggle if downgraded
@@ -738,7 +786,7 @@ q('btnSignIn').addEventListener('click',async()=>{
     q('siPassword').focus();
   }finally{
     btn.disabled=false;
-    btn.innerHTML='Sign In →';
+    btn.innerHTML='Sign in →';
   }
 });
 
@@ -837,7 +885,7 @@ q('btnCreate').addEventListener('click',async()=>{
     const avail=await _relay.checkUsernameAvailable(username);
     if(!avail){
       toast('toastSetup','That username was just taken. Try another.','err');
-      q('btnCreate').disabled=false;q('btnCreate').innerHTML='Create Vault →';return;
+      q('btnCreate').disabled=false;q('btnCreate').innerHTML='Create vault →';return;
     }
     // New accounts use the portable username-derived vault key so they can
     // sign in from a fresh browser with only username + password.
@@ -852,7 +900,7 @@ q('btnCreate').addEventListener('click',async()=>{
     },2200);
   }catch(err){
     toast('toastSetup',err.message,'err');
-    q('btnCreate').disabled=false;q('btnCreate').innerHTML='Create Vault →';
+    q('btnCreate').disabled=false;q('btnCreate').innerHTML='Create vault →';
   }
 });
 
@@ -894,8 +942,8 @@ q('btnBackMain').addEventListener('click',()=>show('vMain'));
 q('btnUpgrade')?.addEventListener('click',openUpgrade);
 q('upgTeaser')?.addEventListener('click',openUpgrade);
 q('btnCheckUpdate')?.addEventListener('click',()=>checkForUpdates({useCache:false}));
-q('btnDownloadUpdate')?.addEventListener('click',()=>chrome.tabs.create({url:updateDownloadUrl}));
-q('btnInstallGuide')?.addEventListener('click',()=>chrome.tabs.create({url:INSTALL_GUIDE_URL}));
+q('btnDownloadUpdate')?.addEventListener('click',()=>openTrustedUrl(updateDownloadUrl, RELEASES_URL));
+q('btnInstallGuide')?.addEventListener('click',()=>openTrustedUrl(INSTALL_GUIDE_URL, RELEASES_URL));
 
 q('btnShowGift')?.addEventListener('click',()=>{
   clrT('toastGift');q('giftInput').value='';show('vGift');
@@ -915,7 +963,7 @@ q('btnShowHistory')?.addEventListener('click',async()=>{
     const vk=await myVaultKey();
     const list=await _relay.listHistory(vk);
     if(list.length===0){
-      q('historyList').innerHTML='<div style="text-align:center;color:var(--t-2);padding:20px">No history yet. Sync to start tracking.</div>';
+      q('historyList').innerHTML='<div class="empty-state"><b>No snapshots yet.</b><span>Run a Pro sync and Relay will keep encrypted restore points for the last 30 days.</span></div>';
       return;
     }
     // FIX [M-8]: Build elements via DOM API instead of innerHTML to prevent XSS
@@ -934,7 +982,7 @@ q('btnShowHistory')?.addEventListener('click',async()=>{
 
       const ico = document.createElement('div');
       ico.className = 'row-icon';
-      ico.textContent = '📅';
+      ico.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M3 10h18"/><rect x="3" y="5" width="18" height="16" rx="2"/></svg>';
 
       const cnt = document.createElement('div');
       cnt.className = 'row-content';
@@ -943,12 +991,12 @@ q('btnShowHistory')?.addEventListener('click',async()=>{
       t.textContent = dt;
       const sub = document.createElement('div');
       sub.className = 'row-subtitle';
-      sub.textContent = `${count} bookmarks · ${ago}`;
+      sub.textContent = `${count} encrypted bookmarks · ${ago}`;
       cnt.append(t, sub);
 
       const tr = document.createElement('div');
       tr.className = 'row-trailing';
-      tr.textContent = '↶';
+      tr.innerHTML = '<svg viewBox="0 0 20 20"><path d="M7 5l-5 5 5 5"/><path d="M3 10h9a5 5 0 0 1 0 10"/></svg>';
 
       btn.append(ico, cnt, tr);
       btn.addEventListener('click', () => confirmRestore(btn.dataset.id));
@@ -987,18 +1035,19 @@ q('btnRestoreConfirm')?.addEventListener('click',async()=>{
     // FIX [M-13]: restoreFromSnapshot now validates decryption before merging
     const {restored,count}=await _relay.restoreFromSnapshot(pendingRestoreId,p,vk);
     await chrome.storage.local.set({bmCount:count,lastSync:new Date().toISOString()});
-    toast('toastRestore',`Restored ${restored} bookmarks. Total: ${count}.`,'ok');
+    toast('toastRestore',`Added ${restored} missing bookmark${restored===1?'':'s'}. Vault total: ${count}.`,'ok');
     setTimeout(async()=>{
       pendingRestoreId=null;
       // Refresh main view with new count
       showStats(count, new Date().toISOString());
-      q('orbSub').textContent=`Synced · just now`;
+      setOrbText('Bookmarks restored', 'Synced · just now');
+      showSyncProof(`${restored} missing bookmark${restored===1?'':'s'} restored from the encrypted snapshot. Current bookmarks were kept.`);
       show('vMain');
     },1800);
   }catch(err){
     toast('toastRestore',err.message,'err');
   }finally{
-    btn.disabled=false;btn.innerHTML='Restore this snapshot';
+    btn.disabled=false;btn.innerHTML='Add missing bookmarks →';
   }
 });
 
@@ -1025,8 +1074,8 @@ q('btnLock').addEventListener('click',async()=>{
   q('statCount').textContent='—';
   q('statTime').textContent='—';
   q('syncStats')?.classList.remove('visible');
-  q('orbLabel').textContent='Sync';
-  q('orbSub').textContent='Encrypt and update your vault.';
+  setOrbText('Sync bookmarks', 'Encrypt, compare, and bring this browser up to date.');
+  showSyncProof('');
   applyPlan('free');
 
   show('vSignIn');

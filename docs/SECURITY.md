@@ -1,6 +1,6 @@
 # Security Model — Relay
 
-Relay was built privacy-first. This document describes the implementation at a high level without exposing private operational details.
+Relay is designed around a narrow promise: sync bookmarks without giving the service a readable bookmark library. This document describes the implementation at a high level without exposing private operational details.
 
 ---
 
@@ -112,7 +112,7 @@ Server-side abuse controls limit excessive sync attempts and retain only short-l
 ```text
 script-src  'self'
 object-src  'self'
-connect-src 'self' https://*.supabase.co https://relayextension.com https://api.github.com
+connect-src 'self' https://mgeiplftbehngfsqtbiq.supabase.co https://relayextension.com https://api.github.com
 ```
 
 No inline scripts. No eval. No external script sources.

@@ -19,6 +19,23 @@ const DEFAULT_CONFIG = {
   maintenance_message: '',
 };
 
+function supabaseUrl(path) {
+  return `${SUPABASE_URL}${path}`;
+}
+
+async function supabaseRequest(path, body) {
+  const res = await fetch(supabaseUrl(path), {
+    method: 'POST',
+    headers: {
+      'apikey':        SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type':  'application/json',
+    },
+    body: JSON.stringify(body || {}),
+  });
+  return res;
+}
+
 async function getConfig() {
   if (_remoteConfig) return _remoteConfig;
   try {
@@ -61,15 +78,7 @@ function friendlyError(raw) {
 // Level 2 (Supabase anonymous auth) will be added when the
 // project's GoTrue version supports grant_type=anonymous.
 async function rpc(name, body) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
-    method: 'POST',
-    headers: {
-      'apikey':        SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Content-Type':  'application/json',
-    },
-    body: JSON.stringify(body || {}),
-  });
+  const res = await supabaseRequest(`/rest/v1/rpc/${name}`, body);
   if (!res.ok) {
     const err = await res.text().catch(() => `HTTP ${res.status}`);
     throw new Error(friendlyError(err));
@@ -322,18 +331,10 @@ async function registerBrowser(vaultId) {
   const ua        = navigator.userAgent.slice(0, 250);
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/register_browser`, {
-      method: 'POST',
-      headers: {
-        'apikey':        SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type':  'application/json',
-      },
-      body: JSON.stringify({
-        p_vault_key:  vaultId,
-        p_browser_id: browserId,
-        p_ua:         ua,
-      }),
+    const res = await supabaseRequest('/rest/v1/rpc/register_browser', {
+      p_vault_key:  vaultId,
+      p_browser_id: browserId,
+      p_ua:         ua,
     });
     if (!res.ok) return { allowed: false, reason: 'verification_unavailable' };
     return await res.json();
@@ -527,15 +528,7 @@ async function restoreFromSnapshot(snapshotId, password, vaultId) {
 
 // ── Gift code redemption ──────────────────────────────────────────────
 async function redeemGiftCode(code, vaultKey) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/redeem_gift_code`, {
-    method: 'POST',
-    headers: {
-      'apikey':        SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Content-Type':  'application/json',
-    },
-    body: JSON.stringify({ p_code: code, p_vault_key: vaultKey }),
-  });
+  const res = await supabaseRequest('/rest/v1/rpc/redeem_gift_code', { p_code: code, p_vault_key: vaultKey });
   if (!res.ok) throw new Error('Server error');
   return await res.json().catch(() => null);
 }
@@ -543,18 +536,10 @@ async function redeemGiftCode(code, vaultKey) {
 async function createCheckout(vaultKey) {
   if (!window._relayCrypto.isValidVaultKey(vaultKey)) throw new Error('Invalid vault key.');
   const siteUrl = 'https://relayextension.com';
-  const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
-    method: 'POST',
-    headers: {
-      'apikey':        SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Content-Type':  'application/json',
-    },
-    body: JSON.stringify({
-      vault_key: vaultKey,
-      success_url: `${siteUrl}/pricing/success.html`,
-      cancel_url:  `${siteUrl}/pricing/`,
-    }),
+  const res = await supabaseRequest('/functions/v1/create-checkout', {
+    vault_key: vaultKey,
+    success_url: `${siteUrl}/pricing/success.html`,
+    cancel_url:  `${siteUrl}/pricing/`,
   });
   const data = await res.json().catch(() => null);
   if (!res.ok || !data) throw new Error('Checkout unavailable. Try again later.');

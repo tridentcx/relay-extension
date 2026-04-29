@@ -1,8 +1,8 @@
 <div align="center">
   <img src="icons/icon128.png" width="80" alt="Relay">
   <h1>Relay</h1>
-  <p><strong>Private bookmark sync for Chrome, Edge, and compatible browsers.</strong><br>
-  Simple, encrypted sync. No email. No tracking. No readable cloud vault.</p>
+  <p><strong>Different browsers. Same bookmarks.</strong><br>
+  One encrypted bookmark vault for Chrome, Edge, Brave, Arc, Opera, and other Chromium browsers. No email account. No tracking profile. No readable cloud copy.</p>
 
   <a href="https://relayextension.com">Website</a> ·
   <a href="https://github.com/trident-cx/relay-extension/releases">Downloads</a> ·
@@ -19,9 +19,13 @@
 
 ## Overview
 
-Relay keeps bookmarks in sync across browsers using only a username and password. Bookmarks are encrypted on-device before upload, and the backend stores an unreadable vault plus the minimum metadata required to operate the service.
+Relay is for people whose bookmarks keep drifting between browsers.
 
-It is designed to feel quiet: open Relay, sync, and get back to what you were doing.
+Create a username, save a password, and Relay builds an encrypted vault in your browser. Chrome, Edge, Brave, Arc, Opera, and other Chromium browsers can stay current without exports, imports, or manual cleanup.
+
+The privacy model stays plain: bookmarks are encrypted before upload, and the backend stores the unreadable vault plus the minimum operational metadata needed to keep sync working.
+
+The product goal is simple: one bookmark library wherever you browse, without making a profile out of you.
 
 This repository is intentionally small and user-facing. It includes:
 
@@ -44,18 +48,18 @@ See [LICENSE](LICENSE) for the governing terms.
 
 | | Free | Pro ($18/yr) |
 |---|---|---|
-| Browsers | 2 | Unlimited |
+| Chromium browsers | 2 | Unlimited |
 | Bookmarks | 500 | Unlimited |
 | Sync | Manual | Auto + manual |
 | History | — | 30-day restore |
 
-## Download and install
+## Install
 
 Download the current stable build from GitHub Releases:
 
 [Relay Releases](https://github.com/trident-cx/relay-extension/releases)
 
-Choose the asset named `relay-extension-stable-v<version>.zip`, then follow [docs/INSTALL.md](docs/INSTALL.md) to load the extension in Chrome or Edge.
+Choose the asset named `relay-extension-stable-v<version>.zip`, then follow [docs/INSTALL.md](docs/INSTALL.md) to load the extension in a supported Chromium-based browser.
 
 ## Quick navigation
 
@@ -69,7 +73,7 @@ Choose the asset named `relay-extension-stable-v<version>.zip`, then follow [doc
 
 ## Updates
 
-Relay can check GitHub Releases from inside the extension and tell you when a newer stable build is available. Browser security does not allow an unpacked extension to silently replace its own files, so updates remain user-approved: download the versioned stable zip, unzip it, and reload the unpacked folder.
+Relay can check GitHub Releases from inside the extension and tell you when a newer stable build is available. Browser security does not allow an unpacked extension to silently replace its own files, so updates stay explicit: download the versioned stable zip, unzip it, and reload the unpacked folder.
 
 ## Security model
 
@@ -78,7 +82,7 @@ Relay separates vault lookup from vault contents:
 2. Your **password** derives the local encryption key for bookmark data.
 3. A local ownership token is required for sensitive server-side actions.
 
-What lives on the server: only the vault key hash and an unreadable encrypted blob.
+What lives on the server: a derived vault identifier, an unreadable encrypted blob, and small operational records for sync, plan limits, and abuse protection.
 
 See [docs/SECURITY.md](docs/SECURITY.md) for the full threat model and implementation details.
 
@@ -149,7 +153,7 @@ git clone https://github.com/trident-cx/relay-extension
 cd relay-extension
 ```
 
-Load the folder unpacked in Chrome or Edge from the extensions page with Developer Mode enabled.
+Load the folder unpacked from your Chromium-based browser's extensions page with Developer Mode enabled.
 
 There is no build step. Relay is plain HTML, CSS, and vanilla JavaScript.
 
@@ -157,6 +161,12 @@ Recommended local validation before pushing:
 
 ```bash
 npm run check
+```
+
+Run the security scanner directly:
+
+```bash
+npm run security:scan
 ```
 
 Regenerate icons and Google submission artwork:
@@ -187,7 +197,7 @@ npm run bump:version -- patch
 
 ## Commercial use and licensing
 
-Relay is proprietary software. The repository is public for transparency, review, and approved collaboration only.
+Relay is proprietary software. The repository is visible for transparency, review, and approved collaboration only.
 
 - Do not fork or deploy Relay for your own product or service without permission
 - Do not reuse the Relay name, icons, or website assets
@@ -203,4 +213,4 @@ If you want to commercialize Relay or negotiate a separate license, use the repo
 
 ## License
 
-Proprietary, source-available. See [LICENSE](LICENSE).
+Proprietary, source-visible. See [LICENSE](LICENSE).

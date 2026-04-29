@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Relay Pro - Private Bookmark Sync</title>
+  <title>Relay Pro - Encrypted Bookmark Sync</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -204,15 +204,15 @@
   <section class="wrap hero">
     <div>
       <div class="eyebrow">Relay Pro</div>
-      <h1>Your bookmarks. Always in reach.</h1>
-      <p>Relay keeps your bookmark vault synced across browsers without email accounts, tracking pixels, or a readable cloud vault.</p>
+      <h1>Different browsers. Same bookmarks.</h1>
+      <p>One encrypted bookmark vault for Chrome, Edge, Brave, Arc, Opera, and other Chromium browsers. Your bookmarks stay with you, without handing over a readable copy of your library.</p>
       <div class="actions">
-        <button class="btn primary" id="btnUpgrade">Upgrade to Pro - $18/year</button>
+        <button class="btn primary" id="btnUpgrade">Keep every browser in sync - $18/year</button>
         <a class="btn secondary" href="https://github.com/trident-cx/relay-extension/releases">Download Relay</a>
       </div>
       <div class="trust-row" aria-label="Privacy highlights">
-        <span class="trust-pill">No email required</span>
-        <span class="trust-pill">End-to-end encrypted</span>
+        <span class="trust-pill">No email account</span>
+        <span class="trust-pill">Encrypted before upload</span>
         <span class="trust-pill">No analytics SDK</span>
       </div>
     </div>
@@ -227,14 +227,14 @@
         <div class="sync-panel">
           <div class="sync-orb">→</div>
           <h3>Synced</h3>
-          <p>1,248 bookmarks encrypted</p>
+          <p>1,248 bookmarks confirmed in the vault</p>
         </div>
         <div class="mock-row">
-          <div><strong>Auto-sync</strong><p>Syncs on every change</p></div>
+          <div><strong>Auto-sync</strong><p>Changes appear across browsers automatically</p></div>
           <span style="color:var(--brand);font-weight:800">On</span>
         </div>
         <div class="mock-row">
-          <div><strong>Sync history</strong><p>30 days of safe restores</p></div>
+          <div><strong>Restore history</strong><p>30 days of encrypted snapshots</p></div>
           <span style="color:var(--brand);font-weight:800">Ready</span>
         </div>
       </div>
@@ -244,14 +244,14 @@
   <section class="wrap plans" id="plans">
     <article class="plan">
       <div class="plan-name">Free</div>
-      <div class="plan-desc">A private starter vault for light bookmark syncing.</div>
+      <div class="plan-desc">For keeping a smaller browser setup in sync manually.</div>
       <div class="price"><strong>$0</strong></div>
       <div class="price-note">Forever free</div>
       <ul class="features">
-        <li><span class="chk">✓</span>Sync across 2 browsers</li>
+        <li><span class="chk">✓</span>Sync across 2 Chromium browsers</li>
         <li><span class="chk">✓</span>Up to 500 bookmarks</li>
-        <li><span class="chk">✓</span>Manual sync</li>
-        <li><span class="chk">✓</span>End-to-end encrypted</li>
+        <li><span class="chk">✓</span>Manual sync across browsers</li>
+        <li><span class="chk">✓</span>Encrypted before upload</li>
         <li class="dim"><span class="chk">-</span>Auto-sync</li>
         <li class="dim"><span class="chk">-</span>30-day restore history</li>
       </ul>
@@ -261,16 +261,16 @@
     <article class="plan featured">
       <div class="plan-tag">Best for daily use</div>
       <div class="plan-name">Pro</div>
-      <div class="plan-desc">For people who depend on bookmarks across work, research, and multiple browsers.</div>
+      <div class="plan-desc">For people whose bookmarks matter across work, research, and more than one browser.</div>
       <div class="price"><strong>$18</strong><span>/year</span></div>
       <div class="price-note">Equivalent to $1.50/month</div>
       <ul class="features">
-        <li><span class="chk">✓</span>Unlimited browsers</li>
+        <li><span class="chk">✓</span>Unlimited Chromium browsers</li>
         <li><span class="chk">✓</span>Unlimited bookmarks</li>
-        <li><span class="chk">✓</span>Auto-sync on bookmark changes</li>
-        <li><span class="chk">✓</span>30-day additive restore history</li>
+        <li><span class="chk">✓</span>Auto-sync when bookmarks change</li>
+        <li><span class="chk">✓</span>30-day encrypted restore history</li>
         <li><span class="chk">✓</span>Priority support</li>
-        <li><span class="chk">✓</span>End-to-end encrypted</li>
+        <li><span class="chk">✓</span>Encrypted before upload</li>
       </ul>
       <button class="btn primary" id="btnUpgradeCard" style="width:100%">Upgrade from Relay</button>
     </article>
@@ -278,8 +278,8 @@
 
   <section class="wrap checkout-section" id="checkoutSection">
     <div class="checkout-card">
-      <div class="checkout-title">Upgrade from the extension</div>
-      <div class="checkout-sub">Open Relay and choose Upgrade so Pro attaches to your encrypted vault without asking for an email address here.</div>
+      <div class="checkout-title">Upgrade from Relay itself</div>
+      <div class="checkout-sub">Open the extension and choose Upgrade. That lets Pro attach to the right encrypted vault without creating an email account here.</div>
       <div class="status-msg" id="statusMsg"></div>
       <button class="btn primary" id="btnCheckout" style="width:100%;margin-top:16px">Show me what to do</button>
       <div class="checkout-note">Payments are handled by Stripe. Relay never receives card details.</div>
@@ -289,7 +289,7 @@
   <section class="wrap faq">
     <div class="section-title">
       <h2>Built for trust, not attention.</h2>
-      <p>Relay is deliberately small: a private vault, a sync button, and clear controls when something needs your attention.</p>
+      <p>Relay is deliberately small: a private vault, one clear sync path, and controls that stay quiet until bookmarks need updating.</p>
     </div>
     <div class="faq-grid">
       <div class="faq-item">
@@ -305,8 +305,8 @@
         <div class="faq-a">Relay avoids email accounts. Starting from the extension lets Pro attach to the correct vault cleanly.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q">What is additive restore?</div>
-        <div class="faq-a">History restore brings missing bookmarks back without deleting bookmarks that currently exist.</div>
+        <div class="faq-q">What happens when bookmarks change?</div>
+        <div class="faq-a">Relay compares your browser with the encrypted vault so changes move with you instead of being repeated by hand.</div>
       </div>
     </div>
   </section>
@@ -333,7 +333,7 @@ function setStatus(msg, type) {
 }
 
 function startCheckout() {
-  setStatus('Open Relay, then tap Upgrade on the main screen or Security screen. The extension will continue from there.', 'ok');
+  setStatus('Open Relay, then tap Upgrade on the main screen or Settings screen. The extension will continue from there.', 'ok');
 }
 
 document.getElementById('btnUpgrade').addEventListener('click', showCheckout);

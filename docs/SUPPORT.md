@@ -1,6 +1,6 @@
 # Support
 
-Relay is privacy-first, so support is intentionally designed around minimal account data. There is no email identity, no password recovery, and no server-side access to bookmark contents.
+Relay support is intentionally built around minimal account data. There is no email identity, no password recovery, and no server-side access to readable bookmark contents.
 
 ## Best support path
 
@@ -11,7 +11,7 @@ Include:
 - Browser and version
 - Relay version from the extension settings screen
 - Whether you are on Free or Pro
-- The action that failed: sign in, sync, restore, upgrade, gift code, or delete account
+- The action that failed: sign in, sync, restore, upgrade, gift code, or account deletion
 - The exact error shown in Relay
 - Whether this is a first browser or an additional browser
 
@@ -25,7 +25,7 @@ Do not include:
 ## Known support boundaries
 
 - Lost passwords cannot be recovered because Relay never stores them.
-- Deleted cloud vaults cannot be restored unless the user has a local browser profile or browser backup containing the bookmarks.
+- Deleted cloud vaults cannot be restored unless you still have a local browser profile or browser backup containing the bookmarks.
 - Sync history is a Pro feature and stores encrypted snapshots only.
 - Billing questions may require Stripe dashboard access.
 

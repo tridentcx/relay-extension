@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "Relay – Private Bookmark Sync",
   "short_name": "Relay",
-  "version": "1.0.9",
-  "description": "Private bookmark sync for Chrome and Edge. Simple, encrypted, no email, no tracking.",
+  "version": "2.0.0",
+  "description": "Different browsers. Same bookmarks. Relay keeps Chromium-based browsers current with an encrypted vault only you can unlock.",
   "permissions": [
     "bookmarks",
     "storage"
@@ -26,6 +26,6 @@
     "128": "icons/icon128.png"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://*.supabase.co https://relayextension.com https://api.github.com"
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://mgeiplftbehngfsqtbiq.supabase.co https://relayextension.com https://api.github.com"
   }
 }
