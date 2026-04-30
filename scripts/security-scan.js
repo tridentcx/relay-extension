@@ -70,7 +70,7 @@ test('javascript avoids dynamic evaluation and broad external opens', () => {
 });
 
 test('html does not use inline event handlers or remote scripts', () => {
-  for (const rel of ['popup.html', 'privacy.html', 'pricing/index.html', 'pricing/success.html']) {
+  for (const rel of ['index.html', 'popup.html', 'privacy.html', 'pricing/index.html', 'pricing/success.html']) {
     const html = read(rel);
     assert.doesNotMatch(html, /\son[a-z]+\s*=/i, `${rel} has inline event handler`);
     assert.doesNotMatch(html, /<script[^>]+src=["']https?:\/\//i, `${rel} loads a remote script`);

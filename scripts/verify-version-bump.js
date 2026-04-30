@@ -84,12 +84,15 @@ assert.equal(oldPkg.version, oldManifest.version, `Base ${base} has mismatched v
 const repoOnlyPatterns = [
   /^README\.md$/,
   /^LICENSE$/,
+  /^index\.html$/,
   /^privacy\.html$/,
+  /^pricing\//,
   /^\.env\.example$/,
   /^docs\//,
   /^supabase\/migrations\//,
   /^\.github\/(ISSUE_TEMPLATE\/|PULL_REQUEST_TEMPLATE\.md$|workflows\/checks\.yml$|workflows\/release\.yml$)/,
   /^tests\/static-contracts\.test\.js$/,
+  /^scripts\/security-scan\.js$/,
   /^scripts\/verify-version-bump\.js$/,
   /^\.gitignore$/,
 ];

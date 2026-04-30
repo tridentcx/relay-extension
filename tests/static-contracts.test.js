@@ -123,6 +123,7 @@ test('package script excludes non-extension pages', () => {
   assert.doesNotMatch(script, new RegExp(`pricing/${String.fromCharCode(97, 100, 109, 105, 110)}\\.html`));
   assert.doesNotMatch(script, new RegExp(`scripts/${String.fromCharCode(97, 100, 109, 105, 110)}-dashboard\\.html`));
   assert.doesNotMatch(script, /privacy\.html/);
+  assert.doesNotMatch(script, /index\.html/);
 });
 
 test('release tooling supports checksums and live sync contract tests', () => {
@@ -146,6 +147,18 @@ test('public docs expose direct download and install instructions', () => {
   assert.match(install, /edge:\/\/extensions/);
   assert.match(install, /Load unpacked/);
   assert.match(install, /Settings.*Updates/s);
+});
+
+test('homepage carries the Relay privacy-first brand', () => {
+  const home = read('index.html');
+  assert.match(home, /Different browsers\. Same bookmarks\./);
+  assert.match(home, /No email account/);
+  assert.match(home, /Encrypted<\/strong> before upload/);
+  assert.match(home, /No readable cloud copy/);
+  assert.match(home, /href="pricing\/"/);
+  assert.match(home, /href="privacy"/);
+  assert.match(home, /No<\/strong> analytics SDK/);
+  assert.doesNotMatch(home, /<script/i);
 });
 
 test('popup exposes a safe GitHub release update checker', () => {
@@ -239,7 +252,7 @@ test('public repo excludes private operations materials', () => {
 });
 
 test('public urls use relayextension domain', () => {
-  const publicFiles = read('README.md') + read('popup.js') + read('popup-loader.js') + read('popup.html') + read('sync.js') + read('privacy.html') + read('pricing/index.html') + read('pricing/success.html') + read('manifest.json');
+  const publicFiles = read('README.md') + read('index.html') + read('popup.js') + read('popup-loader.js') + read('popup.html') + read('sync.js') + read('privacy.html') + read('pricing/index.html') + read('pricing/success.html') + read('manifest.json');
   const restrictedMenuLabel = new RegExp(`>${String.fromCharCode(79, 112, 101, 110)} ${String.fromCharCode(83, 111, 117, 114, 99, 101)}<`);
   const previousOwner = String.fromCharCode(116, 114, 105, 100, 101, 110, 116, 99, 120);
   assert.match(publicFiles, /https:\/\/relayextension\.com/);

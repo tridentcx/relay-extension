@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relay - Different Browsers. Same Bookmarks.</title>
+<meta name="description" content="Relay keeps bookmarks in sync across Chromium-based browsers with an encrypted vault only you can unlock. No email account. No tracking profile.">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F4EE;
+    --paper: #FFFDF8;
+    --paper-2: #EFE9DE;
+    --ink: #242019;
+    --muted: #6F6659;
+    --quiet: #8B8173;
+    --line: rgba(38,34,27,0.13);
+    --brand: #0C6E6E;
+    --brand-2: #084F4F;
+    --brand-hot: #18A7A0;
+    --brand-soft: #E5F2EE;
+    --cream: #FBF7EF;
+    --amber: #B87A25;
+    --shadow: 0 24px 70px rgba(38,34,27,0.14);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 8% 4%, rgba(24,167,160,0.16), transparent 24%),
+      radial-gradient(circle at 92% 8%, rgba(184,122,37,0.11), transparent 26%),
+      linear-gradient(135deg, #FBF7EF 0%, var(--bg) 46%, #E9E1D3 100%);
+    color: var(--ink);
+    font-family: "Avenir Next", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(115deg, transparent 0 44%, rgba(12,110,110,0.08) 44.2% 44.6%, transparent 44.8%),
+      radial-gradient(circle at 50% 120%, rgba(12,110,110,0.10), transparent 36%);
+    opacity: 0.78;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  a:hover { text-decoration: none; }
+  .wrap { width: min(1160px, calc(100% - 40px)); margin: 0 auto; position: relative; }
+
+  .nav {
+    min-height: 78px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .logo {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    box-shadow: 0 12px 30px rgba(12,110,110,0.24);
+  }
+
+  .nav-name { font-size: 18px; font-weight: 850; letter-spacing: -0.03em; }
+  .nav-links { margin-left: auto; display: flex; align-items: center; gap: 18px; color: var(--muted); font-size: 14px; font-weight: 700; }
+  .nav-links a { transition: color .18s; }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-cta {
+    color: #FFFDF8 !important;
+    background: var(--brand);
+    border-radius: 999px;
+    padding: 10px 14px;
+    box-shadow: 0 12px 28px rgba(12,110,110,0.18);
+  }
+
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.02fr) minmax(360px, 0.98fr);
+    gap: 56px;
+    align-items: center;
+    padding: 72px 0 72px;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--brand);
+    background: rgba(12,110,110,0.09);
+    border: 1px solid rgba(12,110,110,0.16);
+    border-radius: 999px;
+    padding: 8px 13px;
+    font-size: 12px;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--brand-hot);
+    box-shadow: 0 0 0 5px rgba(24,167,160,0.10);
+  }
+
+  h1 {
+    max-width: 760px;
+    font-size: clamp(48px, 7vw, 92px);
+    line-height: 0.91;
+    letter-spacing: -0.07em;
+    font-weight: 900;
+    margin-bottom: 24px;
+  }
+
+  .hero-copy {
+    max-width: 650px;
+    color: var(--muted);
+    font-size: 21px;
+    line-height: 1.55;
+    margin-bottom: 30px;
+  }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .btn {
+    border: 1px solid transparent;
+    border-radius: 14px;
+    padding: 15px 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 850;
+    transition: transform .18s, box-shadow .18s, background .18s, border-color .18s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.primary { background: var(--brand); color: #FFFDF8; box-shadow: 0 16px 36px rgba(12,110,110,0.23); }
+  .btn.primary:hover { background: var(--brand-2); box-shadow: 0 20px 44px rgba(12,110,110,0.30); }
+  .btn.secondary { background: rgba(255,253,248,0.66); color: var(--ink); border-color: var(--line); }
+  .btn.secondary:hover { background: var(--paper); border-color: rgba(12,110,110,0.25); }
+
+  .trust-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 24px;
+    color: var(--quiet);
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .trust-pill {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 11px;
+    background: rgba(255,253,248,0.48);
+  }
+  .trust-pill strong { color: var(--brand); }
+
+  .stage {
+    position: relative;
+    min-height: 570px;
+  }
+
+  .browser-card {
+    position: absolute;
+    background: rgba(255,253,248,0.82);
+    border: 1px solid rgba(38,34,27,0.12);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(18px);
+    border-radius: 24px;
+    overflow: hidden;
+  }
+
+  .browser-card.main {
+    width: min(380px, 100%);
+    right: 20px;
+    top: 22px;
+    padding: 18px;
+  }
+
+  .browser-card.left {
+    width: 220px;
+    left: 0;
+    top: 92px;
+    transform: rotate(-5deg);
+    padding: 14px;
+  }
+
+  .browser-card.bottom {
+    width: 255px;
+    right: 0;
+    bottom: 12px;
+    transform: rotate(4deg);
+    padding: 15px;
+  }
+
+  .window-bar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding-bottom: 13px;
+  }
+
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: #D8CFC0; }
+  .dot:nth-child(1) { background: #D87969; }
+  .dot:nth-child(2) { background: #D9A542; }
+  .dot:nth-child(3) { background: #4C9B73; }
+  .bar-title { margin-left: auto; color: var(--quiet); font-size: 11px; font-weight: 850; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .relay-panel {
+    background: var(--paper);
+    border: 1px solid #DDD2C4;
+    border-radius: 20px;
+    padding: 22px;
+  }
+
+  .relay-top { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  .relay-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: linear-gradient(145deg, var(--brand-hot), var(--brand));
+    display: grid;
+    place-items: center;
+    color: #FFFDF8;
+    font-size: 24px;
+    font-weight: 900;
+    box-shadow: 0 16px 32px rgba(12,110,110,0.22);
+  }
+  .relay-title { font-weight: 900; font-size: 19px; letter-spacing: -0.04em; }
+  .relay-sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+  .sync-orb {
+    height: 152px;
+    border-radius: 22px;
+    background:
+      radial-gradient(circle at 50% 46%, rgba(24,167,160,0.22), transparent 32%),
+      linear-gradient(145deg, #F7F4EE, #ECE4D8);
+    border: 1px solid rgba(38,34,27,0.08);
+    display: grid;
+    place-items: center;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sync-orb::before,
+  .sync-orb::after {
+    content: "";
+    position: absolute;
+    width: 174px;
+    height: 44px;
+    border-radius: 14px;
+    background: rgba(255,253,248,0.82);
+    border: 1px solid rgba(38,34,27,0.08);
+    transform: rotate(5deg);
+  }
+
+  .sync-orb::before { left: 18px; top: 36px; }
+  .sync-orb::after { right: 18px; bottom: 34px; transform: rotate(-5deg); }
+
+  .sync-core {
+    position: relative;
+    z-index: 1;
+    width: 72px;
+    height: 72px;
+    border-radius: 22px;
+    background: linear-gradient(145deg, var(--brand-hot), var(--brand));
+    color: #FFFDF8;
+    display: grid;
+    place-items: center;
+    font-size: 34px;
+    font-weight: 900;
+    box-shadow: 0 22px 44px rgba(12,110,110,0.26);
+  }
+
+  .status-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid #DDD2C4;
+    border-radius: 14px;
+    padding: 13px 14px;
+    margin-top: 10px;
+    background: #FBF7EF;
+  }
+
+  .status-line strong { display: block; font-size: 13px; }
+  .status-line span { color: var(--muted); font-size: 12px; }
+  .status-state { color: var(--brand) !important; font-weight: 900; }
+
+  .mini-list { display: grid; gap: 9px; }
+  .mini-item {
+    height: 38px;
+    border-radius: 11px;
+    border: 1px solid rgba(38,34,27,0.09);
+    background: rgba(255,253,248,0.78);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 11px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 750;
+  }
+  .mini-icon { width: 18px; height: 18px; border-radius: 6px; background: var(--brand-soft); }
+
+  .connector {
+    position: absolute;
+    left: 150px;
+    right: 150px;
+    top: 300px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(12,110,110,0.34), transparent);
+    transform: rotate(-10deg);
+  }
+
+  .section { padding: 48px 0; }
+  .section-head { max-width: 730px; margin-bottom: 28px; }
+  .section-kicker {
+    color: var(--brand);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  h2 {
+    font-size: clamp(34px, 4vw, 54px);
+    line-height: 0.98;
+    letter-spacing: -0.055em;
+    margin-bottom: 14px;
+  }
+  .section-head p { color: var(--muted); font-size: 18px; line-height: 1.6; }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+  }
+  .problem-card,
+  .feature-card,
+  .proof-card {
+    background: rgba(255,253,248,0.74);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 22px;
+    box-shadow: 0 12px 34px rgba(38,34,27,0.07);
+  }
+  .problem-card b,
+  .feature-card b,
+  .proof-card b { display: block; font-size: 18px; letter-spacing: -0.03em; margin-bottom: 8px; }
+  .problem-card p,
+  .feature-card p,
+  .proof-card p { color: var(--muted); line-height: 1.55; font-size: 14px; }
+  .num {
+    display: inline-grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+    background: var(--brand-soft);
+    color: var(--brand);
+    font-weight: 900;
+    margin-bottom: 18px;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 0.92fr 1.08fr;
+    gap: 18px;
+    align-items: stretch;
+  }
+
+  .feature-card.large {
+    background:
+      radial-gradient(circle at 20% 16%, rgba(24,167,160,0.16), transparent 32%),
+      rgba(255,253,248,0.78);
+    padding: 28px;
+  }
+
+  .steps { display: grid; gap: 14px; }
+  .step {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 14px;
+    background: rgba(255,253,248,0.70);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 18px;
+  }
+
+  .proof-band {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    align-items: stretch;
+  }
+
+  .proof-card.dark {
+    background: linear-gradient(145deg, #123C3B, #082F31);
+    color: #FFFDF8;
+    border-color: rgba(255,253,248,0.12);
+  }
+  .proof-card.dark p { color: rgba(255,253,248,0.74); }
+  .proof-card.dark .num { background: rgba(255,253,248,0.12); color: #FFFDF8; }
+
+  .compare {
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden;
+    border-radius: 22px;
+    background: rgba(255,253,248,0.78);
+    border: 1px solid var(--line);
+    box-shadow: 0 14px 40px rgba(38,34,27,0.08);
+  }
+  .compare th, .compare td { padding: 16px; text-align: left; border-bottom: 1px solid rgba(38,34,27,0.08); }
+  .compare th { color: var(--quiet); font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; }
+  .compare td { color: var(--muted); font-size: 14px; line-height: 1.45; }
+  .compare strong { color: var(--ink); }
+  .compare tr:last-child td { border-bottom: 0; }
+
+  .cta {
+    margin: 54px 0 78px;
+    border-radius: 32px;
+    padding: clamp(28px, 6vw, 54px);
+    background:
+      radial-gradient(circle at 82% 20%, rgba(24,167,160,0.20), transparent 28%),
+      linear-gradient(145deg, #123C3B, #082F31);
+    color: #FFFDF8;
+    overflow: hidden;
+    position: relative;
+  }
+  .cta h2 { max-width: 720px; }
+  .cta p { max-width: 620px; color: rgba(255,253,248,0.74); font-size: 18px; line-height: 1.6; margin-bottom: 24px; }
+  .cta .btn.primary { background: #FFFDF8; color: var(--brand-2); box-shadow: 0 18px 44px rgba(0,0,0,0.18); }
+  .cta .btn.secondary { color: #FFFDF8; border-color: rgba(255,253,248,0.22); background: rgba(255,253,248,0.08); }
+
+  footer {
+    border-top: 1px solid var(--line);
+    color: var(--quiet);
+    font-size: 13px;
+    padding: 28px 0;
+  }
+  footer .wrap { display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+  footer a { color: var(--muted); font-weight: 700; }
+
+  @media (max-width: 940px) {
+    .hero,
+    .feature-grid,
+    .proof-band { grid-template-columns: 1fr; }
+    .stage { min-height: 520px; max-width: 560px; }
+    .problem-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 620px) {
+    .wrap { width: calc(100% - 32px); }
+    .nav-links a:not(.nav-cta) { display: none; }
+    .hero { padding: 42px 0 54px; gap: 34px; }
+    h1 { font-size: 42px; line-height: 0.96; letter-spacing: -0.055em; }
+    .hero-copy { font-size: 17px; }
+    .actions { display: grid; grid-template-columns: 1fr; }
+    .btn { width: 100%; }
+    .trust-row { display: grid; grid-template-columns: 1fr; }
+    .stage { min-height: 560px; }
+    .browser-card.main { right: 0; left: 0; top: 0; margin: auto; }
+    .browser-card.left { left: -6px; top: 390px; width: 180px; }
+    .browser-card.bottom { right: -5px; bottom: 6px; width: 205px; }
+    .connector { display: none; }
+    .compare { display: block; overflow-x: auto; }
+    footer .wrap { align-items: flex-start; flex-direction: column; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<nav class="wrap nav">
+  <img class="logo" src="icons/icon128.png" alt="" aria-hidden="true">
+  <span class="nav-name">Relay</span>
+  <div class="nav-links">
+    <a href="pricing/">Pricing</a>
+    <a href="privacy">Privacy</a>
+    <a class="nav-cta" href="https://github.com/trident-cx/relay-extension/releases">Download</a>
+  </div>
+</nav>
+
+<main>
+  <section class="wrap hero">
+    <div>
+      <div class="eyebrow">Encrypted bookmark sync</div>
+      <h1>Different browsers. Same bookmarks.</h1>
+      <p class="hero-copy">Relay keeps Chromium-based browsers current with one encrypted vault only you can unlock. No exports. No rebuilding folders. No readable cloud copy of your bookmarks.</p>
+      <div class="actions">
+        <a class="btn primary" href="https://github.com/trident-cx/relay-extension/releases">Download Relay</a>
+        <a class="btn secondary" href="#how-it-works">See how it works</a>
+      </div>
+      <div class="trust-row" aria-label="Relay privacy highlights">
+        <span class="trust-pill"><strong>No email</strong> account</span>
+        <span class="trust-pill"><strong>Encrypted</strong> before upload</span>
+        <span class="trust-pill"><strong>No</strong> analytics SDK</span>
+      </div>
+    </div>
+
+    <div class="stage" aria-label="Relay product illustration">
+      <div class="connector"></div>
+      <div class="browser-card left">
+        <div class="window-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="bar-title">Brave</span></div>
+        <div class="mini-list">
+          <div class="mini-item"><span class="mini-icon"></span>Product ideas</div>
+          <div class="mini-item"><span class="mini-icon"></span>Reading list</div>
+          <div class="mini-item"><span class="mini-icon"></span>Travel plans</div>
+        </div>
+      </div>
+
+      <div class="browser-card main">
+        <div class="window-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="bar-title">Relay</span></div>
+        <div class="relay-panel">
+          <div class="relay-top">
+            <div class="relay-mark">↔</div>
+            <div>
+              <div class="relay-title">Encrypted vault</div>
+              <div class="relay-sub">Only your password unlocks it</div>
+            </div>
+          </div>
+          <div class="sync-orb"><div class="sync-core">↔</div></div>
+          <div class="status-line">
+            <div><strong>Chrome, Edge, Brave+</strong><span>Current across browsers</span></div>
+            <span class="status-state">Synced</span>
+          </div>
+          <div class="status-line">
+            <div><strong>Readable cloud copy</strong><span>Not stored by Relay</span></div>
+            <span class="status-state">Nope</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="browser-card bottom">
+        <div class="window-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="bar-title">Edge</span></div>
+        <div class="mini-list">
+          <div class="mini-item"><span class="mini-icon"></span>Product ideas</div>
+          <div class="mini-item"><span class="mini-icon"></span>Reading list</div>
+          <div class="mini-item"><span class="mini-icon"></span>Travel plans</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <div class="section-head">
+      <div class="section-kicker">The annoying thing Relay fixes</div>
+      <h2>Bookmarks should not turn into browser chores.</h2>
+      <p>Most people do not live inside one browser forever. Work happens in one, personal browsing in another, testing in a third. Then bookmarks drift, folders get rebuilt by hand, and nobody knows which browser has the newest version.</p>
+    </div>
+    <div class="problem-grid">
+      <article class="problem-card">
+        <span class="num">1</span>
+        <b>Manual exports get stale fast.</b>
+        <p>HTML files are fine for one-time moves. They are terrible for bookmarks that keep changing.</p>
+      </article>
+      <article class="problem-card">
+        <span class="num">2</span>
+        <b>Browser profiles become silos.</b>
+        <p>Chrome, Edge, Brave, Arc, Opera, and other Chromium browsers all support bookmarks, but they do not keep each other current.</p>
+      </article>
+      <article class="problem-card">
+        <span class="num">3</span>
+        <b>Cloud sync often means a profile.</b>
+        <p>Relay is built for people who want sync without handing over a readable bookmark library.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap section" id="how-it-works">
+    <div class="feature-grid">
+      <article class="feature-card large">
+        <div class="section-kicker">How Relay works</div>
+        <h2>One vault. Every Chromium browser you choose.</h2>
+        <p>Relay reads the local bookmark tree, encrypts the vault in your browser, and syncs only the encrypted result. Sign in from another supported browser and Relay brings the missing bookmarks across.</p>
+      </article>
+      <div class="steps">
+        <article class="step">
+          <span class="num">1</span>
+          <div><b>Create a vault</b><p>Choose a username and save the generated password. No email account required.</p></div>
+        </article>
+        <article class="step">
+          <span class="num">2</span>
+          <div><b>Sync from one browser</b><p>Relay encrypts the bookmark vault before it reaches the server.</p></div>
+        </article>
+        <article class="step">
+          <span class="num">3</span>
+          <div><b>Sign in elsewhere</b><p>Use the same username and password. Relay decrypts locally and keeps the browser current.</p></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <div class="section-head">
+      <div class="section-kicker">Privacy posture</div>
+      <h2>Useful sync. Less data exhaust.</h2>
+      <p>Relay is intentionally boring about data collection: no email identity, no analytics SDK, no tracking profile, and no plaintext bookmark library on the server.</p>
+    </div>
+    <div class="proof-band">
+      <article class="proof-card dark">
+        <span class="num">✓</span>
+        <b>Your password never leaves the browser.</b>
+        <p>It derives the local encryption key. Relay cannot reset it, because Relay does not have it.</p>
+      </article>
+      <article class="proof-card">
+        <span class="num">✓</span>
+        <b>The backend sees encrypted vault data.</b>
+        <p>The server stores the encrypted result and operational sync records, not a readable copy of bookmark contents.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <div class="section-head">
+      <div class="section-kicker">What changes</div>
+      <h2>From bookmark babysitting to quiet sync.</h2>
+    </div>
+    <table class="compare">
+      <thead>
+        <tr><th>Before Relay</th><th>With Relay</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Export, import, repeat.</strong><br>Manual files age the moment another bookmark changes.</td>
+          <td><strong>Sync from the browser.</strong><br>Relay compares local bookmarks with the encrypted vault and adds what is missing.</td>
+        </tr>
+        <tr>
+          <td><strong>One browser gets messy.</strong><br>Bookmarks are current in one place and weird everywhere else.</td>
+          <td><strong>Browsers stay aligned.</strong><br>Use the same vault across supported Chromium browsers.</td>
+        </tr>
+        <tr>
+          <td><strong>Privacy tradeoffs feel vague.</strong><br>Sync can become another profile.</td>
+          <td><strong>Privacy is the product shape.</strong><br>No email account, no analytics SDK, no readable cloud copy.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="wrap cta">
+    <div class="section-kicker">Ready when you are</div>
+    <h2>Give every browser the same bookmark memory.</h2>
+    <p>Install Relay, create an encrypted vault, and stop manually moving bookmarks around like it is 2009.</p>
+    <div class="actions">
+      <a class="btn primary" href="https://github.com/trident-cx/relay-extension/releases">Download Relay</a>
+      <a class="btn secondary" href="pricing/">Compare Free and Pro</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Relay</span>
+    <span><a href="privacy">Privacy</a> · <a href="pricing/">Pricing</a> · <a href="https://github.com/trident-cx/relay-extension">Repository</a></span>
+  </div>
+</footer>
+</body>
+</html>
