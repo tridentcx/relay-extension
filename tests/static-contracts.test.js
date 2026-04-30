@@ -59,6 +59,18 @@ test('history RPC calls include write-token ownership proof', () => {
   assert.match(sync, /rpc\('get_sync_snapshot'/);
 });
 
+test('remote bookmark restore rejects dangerous bookmark payloads', () => {
+  const sync = read('sync.js');
+  assert.match(sync, /const SAFE_PROTOCOLS = new Set\(\['http:', 'https:', 'ftp:', 'ftps:'\]\)/);
+  assert.match(sync, /function isSafeUrl\(url\)/);
+  assert.match(sync, /if \(!isSafeUrl\(n\.url\)\) continue;/);
+  assert.match(sync, /function sanitizeTitle\(t, maxLen = 2000\)/);
+  assert.match(sync, /replace\(\s*\/\[\\x00-\\x1F\\x7F<>\]\/g,\s*''\s*\)/);
+  assert.match(sync, /if \(depth > 20\) return 0;/);
+  assert.match(sync, /const MAX_PER_SYNC = 10000;/);
+  assert.match(sync, /function isValidNode\(n\)/);
+});
+
 test('package script excludes non-extension pages', () => {
   const script = read('scripts/package-extension.sh');
   assert.match(script, /RELAY_OUTPUT_DIR/);
